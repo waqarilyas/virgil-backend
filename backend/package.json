@@ -1,0 +1,30 @@
+{
+  "name": "virgil-backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^7.4.4",
+    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "ejs-promise": "^0.3.3",
+    "express": "^4.17.1",
+    "express-mongo-sanitize": "^2.1.0",
+    "express-multipart-file-parser": "^0.1.2",
+    "express-validator": "^6.11.1",
+    "helmet": "^4.6.0",
+    "http-status": "^1.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
+    "mongoose": "^5.12.13",
+    "nodemon": "^2.0.7",
+    "xss-clean": "^0.1.1"
+  }
+}
