@@ -25,7 +25,8 @@ const register = async (params, res) => {
     const tokens = await generateAuthTokens(user);
     res.status(httpStatus.OK).send({ user, tokens });
   } catch (err) {
-    res.status(err.statusCode).send({
+    console.log(err);
+    res.status(400).send({
       status: false,
       message: err.message,
     });
