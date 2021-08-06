@@ -1,6 +1,6 @@
 // const AWS = require('aws-sdk');
-// const CONFIG = require('../config/default');
-// const MAILER = require('../config/mailer.config');
+const CONFIG = require("../config/default");
+const MAILER = require("../config/mailer.config");
 
 // exports.uploadToAws = function (pdfBuffer, filename, contentType) {
 //     return new Promise((resolve, reject) => {
@@ -59,13 +59,15 @@ exports.sendEmail = function (to, subject, message) {
       from: CONFIG.senderEmail,
       to: to,
       subject: subject,
-      text: message
-    }
-    MAILER.send(mailOptions).then((info) => {
-      resolve(info);
-    }).catch((error) => {
-      console.log(error);
-      reject(error)
-    });
-  })
-}
+      text: message,
+    };
+    MAILER.send(mailOptions)
+      .then((info) => {
+        resolve(info);
+      })
+      .catch((error) => {
+        console.log(error);
+        reject(error);
+      });
+  });
+};

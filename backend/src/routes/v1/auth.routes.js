@@ -52,7 +52,13 @@ router.post(
 //forgot password
 router.post(
   `/forgotPassword`,
-  [check("email", "Email address is not valid").isEmail()],
+  [
+    check("email", "Email address is not valid").isEmail(),
+    check("code", "Please provide a valid code").isLength({
+      min: 4,
+      max: 4,
+    }),
+  ],
   (req, res, next) => {
     const params = matchedData(req, {
       onlyValidData: true,
