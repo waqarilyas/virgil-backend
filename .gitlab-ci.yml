@@ -6,5 +6,7 @@ heroku_deploy_staging:
  only:
  - staging
  script:
+ - cd backend/
  - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/virgil-dev.git
+ - git pull origin main
  - git push -f heroku main
