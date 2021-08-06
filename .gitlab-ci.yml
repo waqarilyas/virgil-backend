@@ -1,5 +1,5 @@
 stages:
- -heroku_deploy_staging
+ - heroku_deploy_staging
 
 heroku_deploy_staging:
  stage: heroku_deploy_staging
