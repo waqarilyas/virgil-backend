@@ -13,6 +13,7 @@ staging:
     stage: staging
     image: ruby:latest
     script:
+        - cd backend
         - dpl --provider=heroku --app=virgil-dev --api-key=$HEROKU_API_KEY
     only:
         - staging
