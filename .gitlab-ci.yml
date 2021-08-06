@@ -1,11 +1,18 @@
-stages:
- - heroku_deploy_staging
+image: node:latest
 
-heroku_deploy_staging:
- stage: heroku_deploy_staging
- only:
- - staging
- script:
- - cd backend/
- - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/virgil-dev.git
- - git push -f heroku master
+before_script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+
+stages:
+    - staging
+
+staging:
+    type: deploy
+    stage: staging
+    image: ruby:latest
+    script:
+        - dpl --provider=heroku --app=virgil-dev --api-key=$HEROKU_API_KEY
+    only:
+        - staging
