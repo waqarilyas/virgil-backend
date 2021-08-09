@@ -71,3 +71,10 @@ exports.sendEmail = function (to, subject, message) {
       });
   });
 };
+
+exports.apiResposne = (response, statusCode, status, msg) => {
+  response.status(statusCode).send({
+    status: status,
+    message: msg,
+  });
+}

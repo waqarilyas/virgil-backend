@@ -41,7 +41,7 @@ const login = async (params, res) => {
     const tokens = await generateAuthTokens(user);
     res.send({ user, tokens });
   } catch (err) {
-    res.status(err.statusCode).send({
+    res.status(httpStatus.BAD_REQUEST).send({
       status: false,
       message: err.message,
     });
@@ -53,10 +53,7 @@ const forgotPassword = async (params, res) => {
     const emailExist = await User.findOne({ email: params.email });
 
     if (!emailExist) {
-      throw new ApiError(
-        httpStatus.NOT_FOUND,
-        "No users found with this email"
-      );
+      return AUX.apiResposne(res, httpStatus.NOT_FOUND, false, "Email doesn't exit.");
     }
 
     await AUX.sendEmail(
@@ -65,51 +62,12 @@ const forgotPassword = async (params, res) => {
       `Your password reset token for Virgil app is ${params.code}`
     );
     res.status(httpStatus.OK).send({
-      status: false,
+      status: true,
       message: "Password Reset code sent successfully on your email address",
     });
   } catch (err) {
-    res.status(err.statusCode).send({
-      status: false,
-      message: err.message,
-    });
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
   }
-
-  // const emailExist = await User.findOne({ email: req.email });
-  // if (!emailExist) {
-  //   return res.status(400).send({
-  //     status: false,
-  //     message: "Email does not exist",
-  //   });
-  // }
-  // const token = JWT.sign({ _id: req.email }, CONFIG.tokenKey, {
-  //   expiresIn: 86400,
-  // });
-  // const msg = {
-  //   to: req.email,
-  //   from: "siteseekrr@gmail.com",
-  //   subject: "Password reset email",
-  //   text: "Change Your Password",
-  //   html: `<a href="http://localhost:3000/newPassword/${token}">Click Here To change your Password</a>`,
-  // };
-  // sgMail
-  //   .send(msg)
-  //   .then(async () => {
-  //     const passwordToSave = new PasswordToken({
-  //       token,
-  //     });
-  //     await passwordToSave.save();
-  //     res.status(400).send({
-  //       status: false,
-  //       message: "Password Reset email sent successfully on your email address",
-  //     });
-  //   })
-  //   .catch((error) => {
-  //     res.status(400).send({
-  //       status: false,
-  //       message: error,
-  //     });
-  //   });
 };
 
 const verifyCode = async (req, res) => {
