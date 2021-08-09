@@ -6,7 +6,11 @@ const AUX = require("../helpers/auxilaries");
 const EVENT = require("../triggers/custom-events").customEvent;
 
 const { User } = require("../models");
-const { createUser } = require("../services/user.service");
+const {
+  createUser,
+  getUserByEmail,
+  changeUserPassword,
+} = require("../services/user.service");
 const {
   generateAuthTokens,
   removeToken,
@@ -50,7 +54,7 @@ const login = async (params, res) => {
 
 const forgotPassword = async (params, res) => {
   try {
-    const emailExist = await User.findOne({ email: params.email });
+    const emailExist = await getUserByEmail(params.email);
 
     if (!emailExist) {
       return AUX.apiResposne(
@@ -85,7 +89,7 @@ const verifyCode = async (req, res) => {
 
 const changePassword = async (req, res) => {
   try {
-    const emailExist = await User.findOne({ email: req.email });
+    const emailExist = await getUserByEmail(req.email);
 
     if (!emailExist) {
       return AUX.apiResposne(
@@ -98,16 +102,7 @@ const changePassword = async (req, res) => {
 
     const salt = await BCRYPT.genSalt(10);
     const hashedPassword = await BCRYPT.hash(req.password, salt);
-
-    await User.findOneAndUpdate(
-      { email: req.email },
-      {
-        password: hashedPassword,
-      },
-      {
-        insert: true,
-      }
-    );
+    await changeUserPassword(req.email, hashedPassword);
 
     return AUX.apiResposne(
       res,
