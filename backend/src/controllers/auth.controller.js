@@ -53,7 +53,12 @@ const forgotPassword = async (params, res) => {
     const emailExist = await User.findOne({ email: params.email });
 
     if (!emailExist) {
-      return AUX.apiResposne(res, httpStatus.NOT_FOUND, false, "Email doesn't exit.");
+      return AUX.apiResposne(
+        res,
+        httpStatus.NOT_FOUND,
+        false,
+        "Email doesn't exit."
+      );
     }
 
     await AUX.sendEmail(
@@ -80,25 +85,36 @@ const verifyCode = async (req, res) => {
 
 const changePassword = async (req, res) => {
   try {
-    console.log("------req----", req.body);
+    const emailExist = await User.findOne({ email: req.email });
 
-    // const salt = await BCRYPT.genSalt(10);
-    // const hashedPassword = await BCRYPT.hash(req.password, salt);
+    if (!emailExist) {
+      return AUX.apiResposne(
+        res,
+        httpStatus.NOT_FOUND,
+        false,
+        "Email doesn't exit."
+      );
+    }
 
-    // await User.findOneAndUpdate(
-    //   { email: req.email },
-    //   {
-    //     password: hashedPassword,
-    //   },
-    //   {
-    //     insert: true,
-    //   }
-    // );
+    const salt = await BCRYPT.genSalt(10);
+    const hashedPassword = await BCRYPT.hash(req.password, salt);
 
-    res.status(200).send({
-      status: true,
-      message: "Password Updated Successfullly",
-    });
+    await User.findOneAndUpdate(
+      { email: req.email },
+      {
+        password: hashedPassword,
+      },
+      {
+        insert: true,
+      }
+    );
+
+    return AUX.apiResposne(
+      res,
+      httpStatus.OK,
+      true,
+      "Password changed successfully"
+    );
   } catch (err) {
     res.status(500).send({
       status: false,
