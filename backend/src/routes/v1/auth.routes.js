@@ -87,6 +87,28 @@ router.post(
   }
 );
 
+//social Login
+router.post(
+  `/socialLogin`,
+  [
+    check("email", "Email address is not valid").isEmail(),
+    check("name", "Name is not valid").not().isEmpty(),
+    check("platform", "Platform is not valid")
+      .not()
+      .isEmpty()
+      .isIn(["facebook", "google", "apple"]),
+    check("socialId", "SocialId is not valid").not().isEmpty(),
+    check("deviceId", "deviceId is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+
+    if (HAS_ERROR(req, res) == false) auth_controller.socialLogin(params, res);
+  }
+);
+
 //change password
 router.post(
   `/changePassword`,
