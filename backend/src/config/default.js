@@ -8,7 +8,7 @@ module.exports = {
   tokenKey: process.env.JWT_TOKEN_KEY,
   generalErrorResponse:
     "Couldn't get response from the server. Please try again.",
-  senderEmail: process.env.FROM_EMAIL,
+  senderEmail: process.env.EMAIL_FROM,
   SG_API_KEY: process.env.SG_API_KEY,
   AUTH_HEADER_PREFIX: "Bearer ",
   FRONT_END_BASE_PATH: "",
