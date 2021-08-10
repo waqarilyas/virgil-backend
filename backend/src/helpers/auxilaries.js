@@ -9,7 +9,7 @@ exports.uploadToAws = function (pdfBuffer, filename, contentType) {
       const base64Data = pdfBuffer;
 
       const params = {
-        Bucket: CONFIG.aws.bucket,
+        Bucket: CONFIG.AWS.bucket,
         Key: `${CONFIG.DB_NAME}/${filename}`,
         Body: base64Data,
         ACL: "public-read",

@@ -15,13 +15,60 @@ const upload = multer({ storage }).single("image");
 /**
  * @swagger
  * tags:
- *   name: Auth
- *   description: Authentication
+ *   name: General
+ *   description: General Routes Api Documentation
+ */
+/**
+ * @swagger
+ * /general/vehicleRegistration:
+ *   post:
+ *     summary: Register vehicle
+ *     tags: [General]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - email
+ *               - manufacturer
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               manufacturer:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: must be unique
+ *               country:
+ *                 type: string
+ *               nickName:
+ *                 type: string
+ *               buildYear:
+ *                 type: string
+ *               enginePower:
+ *                 type: string
+ *               vehicleType:
+ *                 type: string
+ *               photo:
+ *                 type: string
+ *             example:
+ *               userId: 265645646464
+ *               manufacturer: kawasaki
+ *               email: fake@example.com
+ *               country: US
+ *               nickName: Alam Channa
+ *               buildYear: '2012'
+ *               enginePower: 122cc
+ *               vehicleType: car
+ *               photo: fAYTSasdaGFDSFGDfgadsg
  */
 
 router.post(
   `/vehicleRegistration`,
-  upload,
   [
     check("userId", "User uid is invalid").not().isEmpty(),
     check("email", "Email address is not valid").isEmail(),
@@ -31,14 +78,14 @@ router.post(
     check("buildYear", "BuildYear address is not valid").optional(),
     check("enginePower", "EnginePower address is not valid").optional(),
     check("vehicleType", "Vehicle type is not valid").isIn(["car", "bike"]),
-    check("photo"),
+    check("photo", "Photo is not valid").optional(),
   ],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
       const params = matchedData(req, {
         onlyValidData: true,
       });
-      general_controller.vehicleRegistration(params, res);
+      general_controller.vehicleRegistration(params, req.files, res);
     }
   }
 );
