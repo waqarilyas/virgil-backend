@@ -15,7 +15,7 @@ const userSchema = mongoose.Schema(
     },
     lastName: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     email: {
@@ -32,24 +32,23 @@ const userSchema = mongoose.Schema(
     },
     country: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     zipCode: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     city: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
-      minlength: 8,
       // validate(value) {
       //   if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
       //     throw new ApiError(
@@ -72,6 +71,16 @@ const userSchema = mongoose.Schema(
     deviceId: {
       type: String,
       required: false,
+    },
+    isSocial: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    platform: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   {

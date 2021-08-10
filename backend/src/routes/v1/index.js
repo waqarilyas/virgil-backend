@@ -1,21 +1,24 @@
-const express = require('express');
-const authRoute = require('./auth.routes');
-const config = require('../../config/default');
+const express = require("express");
+const authRoute = require("./auth.routes");
+const config = require("../../config/default");
+const docsRoute = require("./docs.route");
 
 const router = express.Router();
 
+exports.foo = function () {};
+
 const defaultRoutes = [
   {
-    path: '/auth',
+    path: "/auth",
     route: authRoute,
   },
 ];
 
 const devRoutes = [
-  // {
-  //   path: '/docs',
-  //   route: docsRoute,
-  // },
+  {
+    path: "/docs",
+    route: docsRoute,
+  },
 ];
 
 defaultRoutes.forEach((route) => {
@@ -23,7 +26,7 @@ defaultRoutes.forEach((route) => {
 });
 
 /* istanbul ignore next */
-if (config.ENV === 'staging') {
+if (config.ENV === "staging") {
   devRoutes.forEach((route) => {
     router.use(route.path, route.route);
   });

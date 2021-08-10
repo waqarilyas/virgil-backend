@@ -23,6 +23,7 @@ const test = function (req, res) {
     status: true,
   });
 };
+
 const register = async (params, res) => {
   try {
     const user = await createUser(params);
@@ -118,6 +119,43 @@ const changePassword = async (req, res) => {
   }
 };
 
+const socialLogin = async (params, res) => {
+  try {
+    const user = await getUserByEmail(params.email);
+
+    if (user) {
+      await removeToken(user);
+      const tokens = await generateAuthTokens(user);
+      return res.send({ user, tokens });
+    } else {
+      let firstName = "",
+        lastName = "";
+      const splittedArr = params.name.split(" ");
+
+      firstName = splittedArr[0];
+      if (splittedArr.length > 1) {
+        lastName = splittedArr[1];
+      }
+      const userData = {
+        firstName,
+        lastName,
+        email: params.email,
+        deviceId: params.deviceId,
+        platform: params.platform,
+        deviceId: params.deviceId,
+        isSocial: true,
+      };
+      const user = await createUser(userData);
+      const tokens = await generateAuthTokens(user);
+      res
+        .status(httpStatus.OK)
+        .send({ message: "User signup successfull", user, tokens });
+    }
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test: test,
   register,
@@ -125,4 +163,5 @@ module.exports = {
   forgotPassword,
   verifyCode,
   changePassword,
+  socialLogin,
 };
