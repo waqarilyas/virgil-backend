@@ -14,4 +14,8 @@ module.exports = {
   AUTH_HEADER_PREFIX: "Bearer ",
   FRONT_END_BASE_PATH: "",
   jwtSecret: process.env.JWT_SECRET,
+  AWS: {
+    accessKeyId: process.env.accessKeyId,
+    secretAccessKey: process.env.secretAccessKey
+  }
 };

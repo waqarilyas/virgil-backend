@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 require("../triggers/triggers");
+require('../config/aws.config');
 const DEFAULTS = require("./default");
 // let chaneEvents = DEFAULTS.MONGO_CHANGE_EVENTS
 let url = DEFAULTS.DATABASE_PATH;
