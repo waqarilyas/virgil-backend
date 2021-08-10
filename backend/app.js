@@ -7,8 +7,8 @@ const CONFIG = require("./src/config/default");
 const routes = require("./src/routes/v1"); //routes to be used for auth purposes
 
 require("./src/config/database.config"); //Database connection module
-
 const app = express();
+
 require("./src/config/express.config")(app); //CORS and other configs
 
 app.use(`${CONFIG.API_PREFIX}/v1`, routes); //for using routes declared in that section.

@@ -23,6 +23,7 @@ const test = function (req, res) {
     status: true,
   });
 };
+
 const register = async (params, res) => {
   try {
     const user = await createUser(params);

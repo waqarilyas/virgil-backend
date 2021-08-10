@@ -1,6 +1,7 @@
 require("dotenv").config(); //for importing variables from .env file for local development
 
 module.exports = {
+  PORT: process.env.PORT,
   API_PREFIX: "/api",
   ENV: process.env.NODE_ENV,
   DATABASE_PATH: process.env.MONGODB_URL,
