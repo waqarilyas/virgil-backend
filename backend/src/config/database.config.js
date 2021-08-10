@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const emailTrigger = require("../triggers/triggers");
+require("../triggers/triggers");
 const DEFAULTS = require("./default");
 // let chaneEvents = DEFAULTS.MONGO_CHANGE_EVENTS
 let url = DEFAULTS.DATABASE_PATH;
