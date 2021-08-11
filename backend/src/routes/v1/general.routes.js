@@ -1,16 +1,8 @@
 const express = require("express");
-const multer = require("multer");
 const { check, matchedData } = require("express-validator");
 const { HAS_ERROR } = require("../../middlewares/error.middleware");
 const router = express.Router();
 const general_controller = require("../../controllers/general.controller");
-
-const storage = multer.memoryStorage({
-  destination: (req, file, callback) => {
-    callback(null, "");
-  },
-});
-const upload = multer({ storage }).single("image");
 
 /**
  * @swagger
@@ -27,7 +19,7 @@ const upload = multer({ storage }).single("image");
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
@@ -55,6 +47,7 @@ const upload = multer({ storage }).single("image");
  *                 type: string
  *               photo:
  *                 type: string
+ *                 format: binary
  *             example:
  *               userId: 265645646464
  *               manufacturer: kawasaki
