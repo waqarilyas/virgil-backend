@@ -4,8 +4,8 @@ const httpStatus = require("http-status");
 const BCRYPT = require("bcrypt");
 const AUX = require("../helpers/auxilaries");
 const EVENT = require("../triggers/custom-events").customEvent;
-
 const { User } = require("../models");
+
 const {
   createUser,
   getUserByEmail,
