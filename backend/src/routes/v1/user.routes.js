@@ -1,6 +1,7 @@
 const express = require("express");
 const { check, matchedData } = require("express-validator");
 const { HAS_ERROR } = require("../../middlewares/error.middleware");
+const { AUTHENTICATE } = require("../../middlewares/auth.middleware");
 const router = express.Router();
 const user_controller = require("../../controllers/user.controller");
 
@@ -27,7 +28,7 @@ const user_controller = require("../../controllers/user.controller");
  */
 
 router.get(
-  `/:id`,
+  `/getSingleUser`,
   [check("id", "User uid is invalid").not().isEmpty()],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {

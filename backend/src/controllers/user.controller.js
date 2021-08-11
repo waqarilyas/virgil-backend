@@ -1,4 +1,6 @@
 const httpStatus = require("http-status");
+const AUX = require("../helpers/auxilaries");
+const { Vehicle, User } = require("../models");
 
 const { getUserById } = require("../services/user.service");
 

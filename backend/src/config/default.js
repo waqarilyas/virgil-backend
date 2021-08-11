@@ -6,7 +6,7 @@ module.exports = {
   ENV: process.env.NODE_ENV,
   DATABASE_PATH: process.env.MONGODB_URL,
   DB_NAME: process.env.DB_NAME,
-  tokenKey: process.env.JWT_TOKEN_KEY,
+  tokenKey: process.env.JWT_SECRET,
   generalErrorResponse:
     "Couldn't get response from the server. Please try again.",
   senderEmail: process.env.EMAIL_FROM,
