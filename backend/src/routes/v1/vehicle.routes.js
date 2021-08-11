@@ -98,13 +98,13 @@ router.post(
   [
     check("userId", "User uid is invalid").not().isEmpty(),
     check("email", "Email address is not valid").isEmail(),
-    check("manufacturer", "Manufacturer address is not valid").not().isEmpty(),
-    check("country", "Country address is not valid").not().isEmpty(),
-    check("nickName", "NickName address is not valid").optional(),
-    check("buildYear", "BuildYear address is not valid").optional(),
-    check("enginePower", "EnginePower address is not valid").optional(),
     check("vehicleType", "Vehicle type is not valid").isIn(["car", "bike"]),
     check("photo", "Photo is not valid").optional(),
+    check("buildYear", "BuildYear address is not valid").optional(),
+    check("make", "make is not valid").not().isEmpty(),
+    check("model", "model is not valid").not().isEmpty(),
+    check("nickName", "NickName  is not valid").optional(),
+    check("engineSize", "engineSize  is not valid").optional(),
   ],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {

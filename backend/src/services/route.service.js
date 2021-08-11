@@ -7,6 +7,22 @@ const saveRoute = async (params) => {
   return await Route.create(params);
 };
 
+const findRouteById = async (routeId) => {
+  return await Route.findById(routeId);
+};
+
+const getPaginatedRoutesByUserId = async (userId, perPage, page) => {
+  return await Route.find({ owner: userId })
+    .limit(perPage)
+    .skip(page * perPage);
+};
+const getRouteCountByOwnerId = async (userId) => {
+  return await Route.find({ owner: userId }).count();
+};
+
 module.exports = {
   saveRoute,
+  findRouteById,
+  getPaginatedRoutesByUserId,
+  getRouteCountByOwnerId,
 };

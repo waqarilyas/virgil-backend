@@ -4,9 +4,15 @@ const httpStatus = require("http-status");
 const BCRYPT = require("bcrypt");
 const AUX = require("../helpers/auxilaries");
 const { User } = require("../models");
-const { saveRoute } = require("../services/route.service");
+const {
+  saveRoute,
+  findRouteById,
+  getPaginatedRoutesByUserId,
+  getRouteCountByOwnerId,
+} = require("../services/route.service");
 const EVENT = require("../triggers/custom-events").customEvent;
 const Route = require("../models/Route.model");
+const { isValidObjectId } = require("mongoose");
 
 const test = (params, res) => {
   res.status(200).send({
@@ -61,10 +67,41 @@ const saveTrack = async (params, files, res) => {
   }
 };
 
-const getSingleRoute = () => {
+const getSingleRoute = async (params, res) => {
   try {
-    res.status(200).send({
-      message: "Route saved successfully",
+    // await AUX.checkIfValidId(params.routeId, res);
+    const route = await findRouteById(params.routeId);
+    if (route) {
+      return res.status(httpStatus.OK).send({
+        status: true,
+        route,
+      });
+    }
+    return AUX.apiResposne(
+      res,
+      httpStatus.BAD_REQUEST,
+      false,
+      "Route doesn't exist"
+    );
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+const getUserRoutes = async (params, res) => {
+  try {
+    // await AUX.checkIfValidId(params.routeId, res);
+    const route = await getPaginatedRoutesByUserId(
+      params.userId,
+      params.perPage,
+      params.page
+    );
+    const count = await getRouteCountByOwnerId(params.userId);
+
+    return res.status(httpStatus.OK).send({
+      status: true,
+      route,
+      page: params.page,
+      totalResults: count,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
@@ -75,4 +112,5 @@ module.exports = {
   test,
   saveTrack,
   getSingleRoute,
+  getUserRoutes,
 };
