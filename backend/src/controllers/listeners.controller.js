@@ -9,8 +9,16 @@ const updateUserVehicle = async (vehicleId, userid) => {
 };
 
 const updateUserRoute = async (routeId, userId) => {
-  await User.findByIdAndUpdate(userId, {
+  let res = await User.findByIdAndUpdate(userId, {
     $push: { routes: routeId },
+  });
+
+  console.log("--user route updated successfully--", res);
+};
+
+const deleteRouteFromUser = async (routeId, userId) => {
+  await User.findByIdAndUpdate(userId, {
+    $pop: { routes: routeId },
   });
   console.log("--user route updated successfully--");
 };
@@ -18,4 +26,5 @@ const updateUserRoute = async (routeId, userId) => {
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
+  deleteRouteFromUser,
 };

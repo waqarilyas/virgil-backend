@@ -9,6 +9,7 @@ const {
   findRouteById,
   getPaginatedRoutesByUserId,
   getRouteCountByOwnerId,
+  deleteRouteById,
 } = require("../services/route.service");
 const EVENT = require("../triggers/custom-events").customEvent;
 const Route = require("../models/Route.model");
@@ -108,9 +109,33 @@ const getUserRoutes = async (params, res) => {
   }
 };
 
+const deleteRoute = async (params, res) => {
+  try {
+    // await AUX.checkIfValidId(params.routeId, res);
+    const route = await deleteRouteById(params.routeId);
+    EVENT.emit("delete-route-in-user", params.routeId, params.userId);
+
+    if (route) {
+      return res.status(httpStatus.OK).send({
+        message: "route deleted successfully",
+        status: true,
+      });
+    }
+    return AUX.apiResposne(
+      res,
+      httpStatus.BAD_REQUEST,
+      false,
+      "Route doesn't exist"
+    );
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   saveTrack,
   getSingleRoute,
   getUserRoutes,
+  deleteRoute,
 };

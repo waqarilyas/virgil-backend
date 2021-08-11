@@ -20,9 +20,14 @@ const getRouteCountByOwnerId = async (userId) => {
   return await Route.find({ owner: userId }).count();
 };
 
+const deleteRouteById = async (routeId) => {
+  return await Route.findOneAndDelete({ _id: routeId });
+};
+
 module.exports = {
   saveRoute,
   findRouteById,
   getPaginatedRoutesByUserId,
   getRouteCountByOwnerId,
+  deleteRouteById,
 };

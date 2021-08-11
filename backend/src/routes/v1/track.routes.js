@@ -46,10 +46,7 @@ router.post(
 
 router.get(
   `/getSingleRoute`,
-  [
-    // AUTHENTICATE,
-    check("routeId", "routeId is not valid").not().isEmpty(),
-  ],
+  [AUTHENTICATE, check("routeId", "routeId is not valid").not().isEmpty()],
   (req, res, next) => {
     const params = matchedData(req, {
       onlyValidData: true,
@@ -63,7 +60,7 @@ router.get(
 router.get(
   `/getUserRoutes`,
   [
-    //   AUTHENTICATE,
+    AUTHENTICATE,
     check("userId", "routeId is not valid").not().isEmpty(),
     check("page", "page is invalid").not().isEmpty(),
     check("perPage", "perPage is invalid").not().isEmpty(),
@@ -75,6 +72,22 @@ router.get(
 
     if (HAS_ERROR(req, res) == false)
       track_controller.getUserRoutes(params, res);
+  }
+);
+
+router.delete(
+  `/deleteRoute`,
+  [
+    // AUTHENTICATE,
+    check("routeId", "routeId is not valid").not().isEmpty(),
+    check("userId", "userId is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+
+    if (HAS_ERROR(req, res) == false) track_controller.deleteRoute(params, res);
   }
 );
 
