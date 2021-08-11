@@ -1,4 +1,6 @@
 const AWS = require("aws-sdk");
+const httpStatus = require("http-status");
+const { isValidObjectId } = require("mongoose");
 const CONFIG = require("../config/default");
 const MAILER = require("../config/mailer.config");
 
@@ -70,6 +72,14 @@ exports.sendEmail = function (to, subject, message) {
         reject(error);
       });
   });
+};
+exports.checkIfValidId = function (id, res) {
+  if (!isValidObjectId(id)) {
+    return res.status(httpStatus.BAD_REQUEST).send({
+      status: false,
+      message: "invalid id",
+    });
+  }
 };
 
 exports.apiResposne = (response, statusCode, status, msg) => {

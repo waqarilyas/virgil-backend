@@ -44,4 +44,38 @@ router.post(
   }
 );
 
+router.get(
+  `/getSingleRoute`,
+  [
+    // AUTHENTICATE,
+    check("routeId", "routeId is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+
+    if (HAS_ERROR(req, res) == false)
+      track_controller.getSingleRoute(params, res);
+  }
+);
+
+router.get(
+  `/getUserRoutes`,
+  [
+    //   AUTHENTICATE,
+    check("userId", "routeId is not valid").not().isEmpty(),
+    check("page", "page is invalid").not().isEmpty(),
+    check("perPage", "perPage is invalid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+
+    if (HAS_ERROR(req, res) == false)
+      track_controller.getUserRoutes(params, res);
+  }
+);
+
 module.exports = router;

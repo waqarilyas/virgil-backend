@@ -13,15 +13,7 @@ const vehicleSchema = mongoose.Schema(
       enum: ["car", "bike"],
       default: null,
     },
-    manufacturer: {
-      type: String,
-      required: true,
-    },
-    country: {
-      type: String,
-      equired: false,
-    },
-    nickName: {
+    photo: {
       type: String,
       equired: false,
     },
@@ -29,7 +21,19 @@ const vehicleSchema = mongoose.Schema(
       type: String,
       equired: false,
     },
-    photo: {
+    make: {
+      type: String,
+      required: true,
+    },
+    model: {
+      type: String,
+      required: true,
+    },
+    nickName: {
+      type: String,
+      equired: false,
+    },
+    engineSize: {
       type: String,
       equired: false,
     },
