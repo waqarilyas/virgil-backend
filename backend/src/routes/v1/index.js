@@ -3,10 +3,11 @@ const authRoute = require("./auth.routes");
 const generalRoute = require("./general.routes");
 const config = require("../../config/default");
 const docsRoute = require("./docs.routes");
+const userRoute = require("./user.routes");
 
 const router = express.Router();
 
-exports.foo = function () { };
+exports.foo = function () {};
 
 const defaultRoutes = [
   {
@@ -14,9 +15,13 @@ const defaultRoutes = [
     route: authRoute,
   },
   {
-    path: '/general',
-    route: generalRoute
-  }
+    path: "/general",
+    route: generalRoute,
+  },
+  {
+    path: "/user",
+    route: userRoute,
+  },
 ];
 
 const devRoutes = [
