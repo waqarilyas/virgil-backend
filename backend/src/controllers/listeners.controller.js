@@ -5,9 +5,17 @@ const updateUserVehicle = async (vehicleId, userid) => {
   await User.findByIdAndUpdate(userid, {
     $push: { vehicles: vehicleId },
   });
-  console.log("--user has been updated successfully--");
+  console.log("--user vehicle updated successfully--");
+};
+
+const updateUserRoute = async (routeId, userId) => {
+  await User.findByIdAndUpdate(userId, {
+    $push: { routes: routeId },
+  });
+  console.log("--user route updated successfully--");
 };
 
 module.exports = {
   updateUserVehicle,
+  updateUserRoute,
 };

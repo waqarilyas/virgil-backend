@@ -88,6 +88,12 @@ const userSchema = mongoose.Schema(
         ref: "Vehicle",
       },
     ],
+    routes: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Route",
+      },
+    ],
   },
   {
     timestamps: true,

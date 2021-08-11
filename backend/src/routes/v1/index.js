@@ -4,6 +4,8 @@ const generalRoute = require("./general.routes");
 const config = require("../../config/default");
 const docsRoute = require("./docs.routes");
 const userRoute = require("./user.routes");
+const vehicleRoute = require("./vehicle.routes");
+const trackRoute = require("./track.routes");
 
 const router = express.Router();
 
@@ -21,6 +23,14 @@ const defaultRoutes = [
   {
     path: "/user",
     route: userRoute,
+  },
+  {
+    path: "/vehicle",
+    route: vehicleRoute,
+  },
+  {
+    path: "/track",
+    route: trackRoute,
   },
 ];
 
