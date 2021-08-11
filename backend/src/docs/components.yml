@@ -25,15 +25,11 @@ components:
         role:
           type: string
           enum: [user, admin]
-        deviceId:
-          type: string,
-        isSocial: {
+        isSocial: 
           type: boolean,
-        platform: {
+        platform: 
            type: string,
            enum: [google, facebook, apple]
-        } 
-    },
       example:
         id: 5ebac534954b54139806c112
         email: fake@example.com

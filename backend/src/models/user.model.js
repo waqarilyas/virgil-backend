@@ -82,6 +82,12 @@ const userSchema = mongoose.Schema(
       required: false,
       default: null,
     },
+    vehicles: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Vehicle",
+      },
+    ],
   },
   {
     timestamps: true,
