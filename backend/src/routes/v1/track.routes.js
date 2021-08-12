@@ -108,4 +108,22 @@ router.post(
   }
 );
 
+router.post(
+  `/rateARoute`,
+  [
+    AUTHENTICATE,
+    check("routeId", "routeId is not valid").not().isEmpty(),
+    check("userId", "userId is not valid").not().isEmpty(),
+    check("comment", "comment is not valid").not().isEmpty(),
+    check("rating", "rating is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+
+    if (HAS_ERROR(req, res) == false) track_controller.rateRoute(params, res);
+  }
+);
+
 module.exports = router;

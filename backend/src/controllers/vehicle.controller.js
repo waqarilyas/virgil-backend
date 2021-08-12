@@ -19,7 +19,7 @@ const getVehicle = async (params, res) => {
 const getUserVehicles = async (params, res) => {
   try {
     const vehicles = await Vehicle.find({ userId: params.userId })
-      .limit(params.perPage)
+      .limit(parseInt(params.perPage))
       .skip(params.page * params.perPage);
     const count = await Vehicle.find({ userId: params.userId }).count();
 
@@ -38,7 +38,7 @@ const vehicleRegistration = async (params, files, res) => {
   try {
     let vehicle = await saveVehicle(params);
 
-    if (files[0]) {
+    if (files) {
       const photo = await AUX.uploadToAws(
         files[0].buffer,
         vehicle._id,

@@ -20,7 +20,7 @@ const deleteRouteFromUser = async (routeId, userId) => {
   await User.findByIdAndUpdate(userId, {
     $pop: { routes: routeId },
   });
-  console.log("--user route updated successfully--");
+  console.log("--user route deleted successfully--");
 };
 
 module.exports = {

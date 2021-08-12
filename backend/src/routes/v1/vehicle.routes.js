@@ -4,13 +4,26 @@ const { HAS_ERROR } = require("../../middlewares/error.middleware");
 const router = express.Router();
 const vehicle_controller = require("../../controllers/vehicle.controller");
 const { AUTHENTICATE } = require("../../middlewares/auth.middleware");
-
+const bodyParser = require("body-parser");
 /**
  * @swagger
  * tags:
  *   name: General
  *   description: General Routes Api Documentation
  */
+
+const multer = require("multer");
+
+const storage = multer.memoryStorage({
+  destination: (req, file, callback) => {
+    callback(null, "");
+  },
+  filename(req, file, callback) {
+    callback(null, `${file.fieldname}_${Date.now()}_${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage }).single("photo");
 
 router.get(
   `/getSingleVehicle`,
@@ -93,6 +106,7 @@ router.get(
  *               photo: fAYTSasdaGFDSFGDfgadsg
  */
 
+router.use(upload);
 router.post(
   `/vehicleRegistration`,
   [
@@ -106,12 +120,13 @@ router.post(
     check("nickName", "NickName  is not valid").optional(),
     check("engineSize", "engineSize  is not valid").optional(),
   ],
+  upload,
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
       const params = matchedData(req, {
         onlyValidData: true,
       });
-      vehicle_controller.vehicleRegistration(params, req.files, res);
+      vehicle_controller.vehicleRegistration(params, req.file, res);
     }
   }
 );

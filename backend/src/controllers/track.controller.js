@@ -13,6 +13,7 @@ const {
 } = require("../services/route.service");
 const EVENT = require("../triggers/custom-events").customEvent;
 const Route = require("../models/Route.model");
+const Comment = require("../models/Comment.model");
 
 const test = (params, res) => {
   res.status(200).send({
@@ -29,7 +30,7 @@ const saveTrack = async (params, files, res) => {
       coordinates,
       distanceCovered,
       owner,
-      userId,
+
       routeLength,
     } = params;
     const veh = {
@@ -39,7 +40,7 @@ const saveTrack = async (params, files, res) => {
       coordinates,
       distanceCovered,
       owner,
-      userId,
+
       routeLength,
     };
     let rt = await saveRoute(veh);
@@ -59,7 +60,7 @@ const saveTrack = async (params, files, res) => {
       rt = updatedRoute;
     }
 
-    EVENT.emit("update-route-in-user", rt._id, params.userId);
+    EVENT.emit("update-route-in-user", rt._id, owner);
 
     res.status(200).send({
       message: "Route saved successfully",
@@ -138,9 +139,45 @@ const runRoute = async (params, res) => {
   try {
     const { routeId, userId, totalDistance } = params;
 
-    await Route.findByIdAndUpdate(routeId, {
-      $inc: { timesTaken: 1 },
-      $push: { riddenBy: userId },
+    const updatedRoute = await Route.findByIdAndUpdate(
+      routeId,
+      {
+        $inc: { timesTaken: 1, totalDistanceCovered: totalDistance },
+        $push: { riddenBy: userId },
+      },
+      { new: true }
+    );
+
+    return res.status(httpStatus.OK).send({
+      status: true,
+      message: "route ran successfully",
+      route: updatedRoute,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const rateRoute = async (params, res) => {
+  try {
+    const { userId, routeId, comment, rating } = params;
+
+    const review = await Comment.create({
+      userId,
+      routeId,
+      message: comment,
+      rating,
+    });
+    const route = await Route.findById(routeId);
+
+    const averageRating = (route.totalRating + rating) / 5;
+    const updatedRoute = await Route.findByIdAndUpdate(routeId, {
+      totalRating: averageRating,
+    });
+
+    res.status(200).send({
+      message: "Review added successfully",
+      route: updatedRoute,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
@@ -154,4 +191,5 @@ module.exports = {
   getUserRoutes,
   deleteRoute,
   runRoute,
+  rateRoute,
 };
