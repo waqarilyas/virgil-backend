@@ -78,7 +78,7 @@ router.get(
 router.delete(
   `/deleteRoute`,
   [
-    // AUTHENTICATE,
+    AUTHENTICATE,
     check("routeId", "routeId is not valid").not().isEmpty(),
     check("userId", "userId is not valid").not().isEmpty(),
   ],

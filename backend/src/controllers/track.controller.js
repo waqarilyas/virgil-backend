@@ -43,25 +43,28 @@ const saveTrack = async (params, files, res) => {
       owner,
       userId,
     };
-    const rt = await saveRoute(veh);
-    const photo = await AUX.uploadToAws(
-      files[0].buffer,
-      rt._id,
-      files[0].mimetype
-    );
-    const updatedRoute = await Route.findByIdAndUpdate(
-      rt._id,
-      {
-        routeSnap: photo.Location,
-      },
-      { new: true }
-    );
+    let rt = await saveRoute(veh);
+    if (files[0]) {
+      const photo = await AUX.uploadToAws(
+        files[0].buffer,
+        rt._id,
+        files[0].mimetype
+      );
+      const updatedRoute = await Route.findByIdAndUpdate(
+        rt._id,
+        {
+          routeSnap: photo.Location,
+        },
+        { new: true }
+      );
+      rt = updatedRoute;
+    }
 
     EVENT.emit("update-route-in-user", rt._id, params.userId);
 
     res.status(200).send({
       message: "Route saved successfully",
-      route: updatedRoute,
+      route: rt,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
