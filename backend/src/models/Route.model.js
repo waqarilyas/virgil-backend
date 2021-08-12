@@ -22,15 +22,14 @@ const routeSchema = mongoose.Schema(
       type: String,
       required: false,
     },
-    distanceCovered: {
+    routeLength: {
       type: String,
       required: true,
       trim: true,
     },
     timeTaken: {
-      type: String,
-      required: true,
-      trim: true,
+      type: Number,
+      required: false,
     },
     owner: {
       type: mongoose.SchemaTypes.ObjectId,
