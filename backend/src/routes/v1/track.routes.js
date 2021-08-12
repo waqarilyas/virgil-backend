@@ -30,7 +30,7 @@ router.post(
     check("isPublic", "isPublic is not valid").not().isEmpty(),
     check("coordinates", "coordinates is not valid").not().isEmpty(),
     check("routeSnap", "routeSnap is not valid").optional(),
-    check("distanceCovered", "distanceCovered is not valid").not().isEmpty(),
+    check("routeLength", "routeLength is not valid").not().isEmpty(),
     check("timeTaken", "timeTaken is not valid").not().isEmpty(),
     check("owner", "owner is not valid").not().isEmpty(),
   ],
@@ -88,6 +88,23 @@ router.delete(
     });
 
     if (HAS_ERROR(req, res) == false) track_controller.deleteRoute(params, res);
+  }
+);
+
+router.post(
+  `/runRoute`,
+  [
+    AUTHENTICATE,
+    check("routeId", "routeId is not valid").not().isEmpty(),
+    check("userId", "userId is not valid").not().isEmpty(),
+    check("totalDistance", "totalDistance is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+
+    if (HAS_ERROR(req, res) == false) track_controller.runRoute(params, res);
   }
 );
 

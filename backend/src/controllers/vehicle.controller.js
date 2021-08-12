@@ -36,22 +36,29 @@ const getUserVehicles = async (params, res) => {
 
 const vehicleRegistration = async (params, files, res) => {
   try {
-    const vehicle = await saveVehicle(params);
-    const photo = await AUX.uploadToAws(
-      files[0].buffer,
-      vehicle._id,
-      files[0].mimetype
-    );
+    let vehicle = await saveVehicle(params);
 
-    const updatedVehicle = await Vehicle.findByIdAndUpdate(vehicle._id, {
-      photo: photo.Location,
-    });
+    if (files[0]) {
+      const photo = await AUX.uploadToAws(
+        files[0].buffer,
+        vehicle._id,
+        files[0].mimetype
+      );
+      const updatedVehicle = await Vehicle.findByIdAndUpdate(
+        vehicle._id,
+        {
+          photo: photo.Location,
+        },
+        { new: true }
+      );
+      vehicle = updatedVehicle;
+    }
 
     EVENT.emit("update-vehicle-in-user", vehicle._id, params.userId);
     res.status(httpStatus.OK).send({
       status: true,
       message: "Vehicle registered successfully",
-      vehicle: updatedVehicle,
+      vehicle: vehicle,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);

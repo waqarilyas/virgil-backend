@@ -13,7 +13,6 @@ const {
 } = require("../services/route.service");
 const EVENT = require("../triggers/custom-events").customEvent;
 const Route = require("../models/Route.model");
-const { isValidObjectId } = require("mongoose");
 
 const test = (params, res) => {
   res.status(200).send({
@@ -29,9 +28,9 @@ const saveTrack = async (params, files, res) => {
       isPublic,
       coordinates,
       distanceCovered,
-      timeTaken,
       owner,
       userId,
+      routeLength,
     } = params;
     const veh = {
       rideName,
@@ -39,9 +38,9 @@ const saveTrack = async (params, files, res) => {
       isPublic,
       coordinates,
       distanceCovered,
-      timeTaken,
       owner,
       userId,
+      routeLength,
     };
     let rt = await saveRoute(veh);
     if (files[0]) {
@@ -135,10 +134,24 @@ const deleteRoute = async (params, res) => {
   }
 };
 
+const runRoute = async (params, res) => {
+  try {
+    const { routeId, userId, totalDistance } = params;
+
+    await Route.findByIdAndUpdate(routeId, {
+      $inc: { timesTaken: 1 },
+      $push: { riddenBy: userId },
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   saveTrack,
   getSingleRoute,
   getUserRoutes,
   deleteRoute,
+  runRoute,
 };
