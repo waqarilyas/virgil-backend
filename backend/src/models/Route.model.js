@@ -27,6 +27,11 @@ const routeSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    totalDistanceCovered: {
+      type: Number,
+      required: false,
+      trim: true,
+    },
     timeTaken: {
       type: Number,
       required: false,
@@ -40,6 +45,11 @@ const routeSchema = mongoose.Schema(
       type: Array,
       default: [],
       required: false,
+    },
+    totalRating: {
+      type: Number,
+      required: false,
+      default: 0,
     },
     reviews: {
       type: Array,
