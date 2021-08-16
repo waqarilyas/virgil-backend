@@ -33,6 +33,7 @@ router.post(
     check("routeLength", "routeLength is not valid").not().isEmpty(),
     check("timeTaken", "timeTaken is not valid").not().isEmpty(),
     check("owner", "owner is not valid").not().isEmpty(),
+    check("vehicleId", "vehicleId is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {

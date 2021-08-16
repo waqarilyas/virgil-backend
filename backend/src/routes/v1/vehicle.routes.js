@@ -110,7 +110,6 @@ router.post(
   `/vehicleRegistration`,
 
   [
-    upload,
     check("userId", "User uid is invalid").not().isEmpty(),
     check("email", "Email address is not valid").isEmail(),
     check("vehicleType", "Vehicle type is not valid").isIn(["car", "bike"]),

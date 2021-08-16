@@ -28,19 +28,16 @@ const saveTrack = async (params, files, res) => {
       descriptors,
       isPublic,
       coordinates,
-      distanceCovered,
       owner,
-
       routeLength,
+      vehicelId,
     } = params;
     const veh = {
       rideName,
       descriptors,
       isPublic,
       coordinates,
-      distanceCovered,
       owner,
-
       routeLength,
     };
     let rt = await saveRoute(veh);
@@ -61,6 +58,7 @@ const saveTrack = async (params, files, res) => {
     }
 
     EVENT.emit("update-route-in-user", rt._id, owner);
+    EVENT.emit("update-route-distance-in-vehicle", vehicelId, routeLength);
 
     res.status(200).send({
       message: "Route saved successfully",
