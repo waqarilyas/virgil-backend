@@ -30,7 +30,7 @@ const saveTrack = async (params, files, res) => {
       coordinates,
       owner,
       routeLength,
-      vehicelId,
+      vehicleId,
     } = params;
     const veh = {
       rideName,
@@ -58,7 +58,7 @@ const saveTrack = async (params, files, res) => {
     }
 
     EVENT.emit("update-route-in-user", rt._id, owner);
-    EVENT.emit("update-route-distance-in-vehicle", vehicelId, routeLength);
+    EVENT.emit("update-route-distance-in-vehicle", vehicleId, routeLength);
 
     res.status(200).send({
       message: "Route saved successfully",
@@ -135,7 +135,7 @@ const deleteRoute = async (params, res) => {
 
 const runRoute = async (params, res) => {
   try {
-    const { routeId, userId, totalDistance } = params;
+    const { routeId, userId, totalDistance, vehicleId } = params;
 
     const updatedRoute = await Route.findByIdAndUpdate(
       routeId,
@@ -145,6 +145,7 @@ const runRoute = async (params, res) => {
       },
       { new: true }
     );
+    EVENT.emit("update-route-distance-in-vehicle", vehicleId, totalDistance);
 
     return res.status(httpStatus.OK).send({
       status: true,
