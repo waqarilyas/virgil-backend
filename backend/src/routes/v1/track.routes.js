@@ -128,4 +128,20 @@ router.post(
   }
 );
 
+router.get(
+  `/getUserListing`,
+  [
+    AUTHENTICATE,
+    check("page", "page is not valid").not().isEmpty(),
+    check("perPage", "perPage is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    if (HAS_ERROR(req, res) == false) params.userId = req.userId;
+    track_controller.getUserListing(params, res);
+  }
+);
+
 module.exports = router;

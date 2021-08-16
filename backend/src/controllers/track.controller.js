@@ -183,6 +183,22 @@ const rateRoute = async (params, res) => {
   }
 };
 
+const getUserListing = async (params, res) => {
+  try {
+    const { perPage, page } = params;
+
+    const routes = await Route.find({})
+      .limit(parseInt(perPage))
+      .skip(page * perPage);
+    res.status(200).send({
+      status: true,
+      routes,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   saveTrack,
@@ -191,4 +207,5 @@ module.exports = {
   deleteRoute,
   runRoute,
   rateRoute,
+  getUserListing,
 };
