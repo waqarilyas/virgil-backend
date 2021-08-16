@@ -99,6 +99,7 @@ router.post(
     check("routeId", "routeId is not valid").not().isEmpty(),
     check("userId", "userId is not valid").not().isEmpty(),
     check("totalDistance", "totalDistance is not valid").not().isEmpty(),
+    check("vehicleId", "vehicleId is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {
