@@ -32,11 +32,15 @@ const saveTrack = async (params, files, res) => {
       routeLength,
       vehicleId,
     } = params;
+
+    const desc = JSON.parse(descriptors);
+    const coords = JSON.parse(coordinates);
+
     const veh = {
       rideName,
-      descriptors,
+      descriptors: desc,
       isPublic,
-      coordinates,
+      coordinates: coords,
       owner,
       routeLength,
     };
@@ -169,10 +173,14 @@ const rateRoute = async (params, res) => {
     });
     const route = await Route.findById(routeId);
 
-    const averageRating = (route.totalRating + rating) / 5;
-    const updatedRoute = await Route.findByIdAndUpdate(routeId, {
-      totalRating: averageRating,
-    });
+    const averageRating = (route.totalRating * 5 + rating) / 5;
+    const updatedRoute = await Route.findByIdAndUpdate(
+      routeId,
+      {
+        totalRating: route.totalRating == 0 ? rating : averageRating,
+      },
+      { new: true }
+    );
 
     res.status(200).send({
       message: "Review added successfully",
@@ -188,8 +196,11 @@ const getUserListing = async (params, res) => {
     const { perPage, page } = params;
 
     const routes = await Route.find({})
+      .sort({ createdAt: -1 })
       .limit(parseInt(perPage))
-      .skip(page * perPage);
+      .skip(page * perPage)
+      .lean(["totalRating"]);
+
     res.status(200).send({
       status: true,
       routes,
