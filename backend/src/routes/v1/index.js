@@ -6,6 +6,7 @@ const docsRoute = require("./docs.routes");
 const userRoute = require("./user.routes");
 const vehicleRoute = require("./vehicle.routes");
 const trackRoute = require("./track.routes");
+const requestRoute = require("./requests.routes");
 
 const router = express.Router();
 
@@ -31,6 +32,10 @@ const defaultRoutes = [
   {
     path: "/track",
     route: trackRoute,
+  },
+  {
+    path: "/request",
+    route: requestRoute,
   },
 ];
 

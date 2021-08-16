@@ -3,7 +3,7 @@ const { check, matchedData } = require("express-validator");
 const { HAS_ERROR } = require("../../middlewares/error.middleware");
 const { AUTHENTICATE } = require("../../middlewares/auth.middleware");
 const router = express.Router();
-const user_controller = require("../../controllers/user.controller");
+const request_controller = require("../../controllers/request.controller");
 
 /**
  * @swagger
@@ -28,27 +28,31 @@ const user_controller = require("../../controllers/user.controller");
  */
 
 router.get(
-  `/getSingleUser`,
-  [check("id", "User uid is invalid").not().isEmpty()],
+  `/test`,
+  //   [check("id", "User uid is invalid").not().isEmpty()],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
       const params = matchedData(req, {
         onlyValidData: true,
       });
-      user_controller.getUser(params, res);
+      request_controller.test(params, res);
     }
   }
 );
 
 router.get(
-  `/addFriend`,
-  [check("id", "User uid is invalid").not().isEmpty()],
+  `/sendFriendRequest`,
+  [
+    AUTHENTICATE,
+    check("requestFrom", "requestFrom is invalid").not().isEmpty(),
+    check("requestTo", "requestTo is invalid").not().isEmpty(),
+  ],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
       const params = matchedData(req, {
         onlyValidData: true,
       });
-      user_controller.getUser(params, res);
+      request_controller.sendFriendRequest(params, res);
     }
   }
 );
