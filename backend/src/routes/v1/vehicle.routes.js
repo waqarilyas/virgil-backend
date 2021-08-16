@@ -106,9 +106,9 @@ router.get(
  *               photo: fAYTSasdaGFDSFGDfgadsg
  */
 
-router.use(upload);
 router.post(
   `/vehicleRegistration`,
+
   [
     check("userId", "User uid is invalid").not().isEmpty(),
     check("email", "Email address is not valid").isEmail(),
@@ -120,7 +120,6 @@ router.post(
     check("nickName", "NickName  is not valid").optional(),
     check("engineSize", "engineSize  is not valid").optional(),
   ],
-  upload,
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
       const params = matchedData(req, {

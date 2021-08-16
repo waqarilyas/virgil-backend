@@ -15,11 +15,11 @@ const vehicleSchema = mongoose.Schema(
     },
     photo: {
       type: String,
-      equired: false,
+      required: false,
     },
     buildYear: {
       type: String,
-      equired: false,
+      required: true,
     },
     make: {
       type: String,
@@ -31,11 +31,21 @@ const vehicleSchema = mongoose.Schema(
     },
     nickName: {
       type: String,
-      equired: false,
+      required: true,
     },
     engineSize: {
       type: String,
-      equired: false,
+      required: true,
+    },
+    totalTrips: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    distanceCovered: {
+      type: Number,
+      required: false,
+      default: 0,
     },
   },
   {

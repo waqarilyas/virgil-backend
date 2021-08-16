@@ -1,4 +1,5 @@
-const { User } = require("../models");
+const { User, Vehicle } = require("../models");
+const Route = require("../models/Route.model");
 const { updateUserById } = require("../services/user.service");
 
 const updateUserVehicle = async (vehicleId, userid) => {
@@ -13,7 +14,7 @@ const updateUserRoute = async (routeId, userId) => {
     $push: { routes: routeId },
   });
 
-  console.log("--user route updated successfully--", res);
+  console.log("--user route updated successfully--");
 };
 
 const deleteRouteFromUser = async (routeId, userId) => {
@@ -23,8 +24,17 @@ const deleteRouteFromUser = async (routeId, userId) => {
   console.log("--user route deleted successfully--");
 };
 
+const updateVehicleDistance = async (vehicleId, routeLength) => {
+  await Vehicle.findByIdAndUpdate(vehicleId, {
+    $inc: { distanceCovered: routeLength, totalTrips: 1 },
+  });
+
+  console.log("vehicle total distance and route number updated successfully");
+};
+
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
   deleteRouteFromUser,
+  updateVehicleDistance,
 };
