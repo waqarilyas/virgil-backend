@@ -57,4 +57,31 @@ router.get(
   }
 );
 
+router.post(
+  `/handleFriendRequest`,
+  [
+    AUTHENTICATE,
+    check("requestId", "requestFrom is invalid").not().isEmpty(),
+    check("operation", "requestTo is invalid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    if (HAS_ERROR(req, res) == false) {
+      const params = matchedData(req, {
+        onlyValidData: true,
+      });
+      request_controller.acceptRejectFriendRequest(params, res);
+    }
+  }
+);
+
+router.get(`/getFriendRequests`, [AUTHENTICATE], (req, res, next) => {
+  if (HAS_ERROR(req, res) == false) {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    params.userId = req.userId;
+    request_controller.getFriendRequests(params, res);
+  }
+});
+
 module.exports = router;

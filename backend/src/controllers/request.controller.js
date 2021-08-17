@@ -8,7 +8,15 @@ const { User } = require("../models");
 const {
   saveRequest,
   checkIfFriendRequestExists,
+  getRequestById,
+  changeRequestStatus,
+  getRequestsByRequestTo,
 } = require("../services/request.service");
+
+const {
+  addToUserFriends,
+  removeUserFriend,
+} = require("../services/user.service");
 
 const test = (params, res) => {
   res.status(200).send({
@@ -45,7 +53,59 @@ const sendFriendRequest = async (params, res) => {
   }
 };
 
+const acceptRejectFriendRequest = async (params, res) => {
+  try {
+    const { requestId, operation } = params;
+    const request = await getRequestById(requestId);
+
+    // operation can be ACCEPT or REJECT
+    if (operation === "REJECT") {
+      await changeRequestStatus(requestId, "REJECTED");
+      await removeUserFriend(request.requestFrom, request.requestTo);
+      return res.status(200).send({
+        message: "Friend Request rejected succesfully",
+        status: true,
+      });
+    } else if (operation === "ACCEPT") {
+      await changeRequestStatus(requestId, "ACCEPTED");
+      await addToUserFriends(request.requestFrom, request.requestTo);
+      await addToUserFriends(request.requestTo, request.requestFrom);
+
+      return res.status(200).send({
+        message: "Friend Request accepted successfully",
+        status: true,
+      });
+    }
+
+    return res.status(400).send({
+      message:
+        "Invalid operation. Operation can either be 'ACCEPT' or 'REJECT'",
+      status: true,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const getFriendRequests = async (params, res) => {
+  try {
+    const { userId } = params;
+
+    const requests = await getRequestsByRequestTo(userId);
+
+    return res.status(200).send({
+      message: "successfull",
+      status: true,
+      requests,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   sendFriendRequest,
+  acceptRejectFriendRequest,
+  getFriendRequests,
 };

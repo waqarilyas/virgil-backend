@@ -14,7 +14,26 @@ const checkIfFriendRequestExists = async (params) => {
   return res.length > 0 ? true : false;
 };
 
+const getRequestById = async (requestId) => {
+  return await Requests.findOne({ _id: requestId });
+};
+
+const changeRequestStatus = async (requestId, status) => {
+  return await Requests.findByIdAndUpdate(
+    requestId,
+    { status: status },
+    { new: true }
+  );
+};
+
+const getRequestsByRequestTo = async (requestTo) => {
+  return await Requests.find({ requestTo: requestTo, status: "notAccepted" });
+};
+
 module.exports = {
   saveRequest,
   checkIfFriendRequestExists,
+  getRequestById,
+  changeRequestStatus,
+  getRequestsByRequestTo,
 };

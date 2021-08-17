@@ -18,6 +18,12 @@ const requestsSchema = mongoose.Schema(
       required: false,
       trim: true,
     },
+    status: {
+      type: String,
+      required: false,
+      trim: true,
+      default: "notAccepted",
+    },
   },
   {
     timestamps: true,
