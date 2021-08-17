@@ -1,6 +1,7 @@
 const { User, Vehicle } = require("../models");
 const Route = require("../models/Route.model");
 const { updateUserById } = require("../services/user.service");
+const { saveNewActivityLog } = require("../services/activityLog.service");
 
 const updateUserVehicle = async (vehicleId, userid) => {
   await User.findByIdAndUpdate(userid, {
@@ -32,9 +33,15 @@ const updateVehicleDistance = async (vehicleId, routeLength) => {
   console.log("vehicle total distance and route number updated successfully");
 };
 
+const updateActivityLog = async (params) => {
+  await saveNewActivityLog(params);
+  console.log("--user activity log saved successfully--");
+};
+
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
   deleteRouteFromUser,
   updateVehicleDistance,
+  updateActivityLog,
 };

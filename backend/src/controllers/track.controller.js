@@ -63,6 +63,15 @@ const saveTrack = async (params, files, res) => {
 
     EVENT.emit("update-route-in-user", rt._id, owner);
     EVENT.emit("update-route-distance-in-vehicle", vehicleId, routeLength);
+    EVENT.emit("update-activity-log", {
+      userId: owner,
+      message: "You saved a new route",
+      extraInfo: {
+        activityType: "SAVE_NEW_ROUTE",
+        documentName: "routeId",
+        relatedDocumentId: rt._id,
+      },
+    });
 
     res.status(200).send({
       message: "Route saved successfully",
@@ -151,6 +160,15 @@ const runRoute = async (params, res) => {
       { new: true }
     );
     EVENT.emit("update-route-distance-in-vehicle", vehicleId, totalDistance);
+    EVENT.emit("update-activity-log", {
+      userId: userId,
+      message: "You ran a route",
+      extraInfo: {
+        activityType: "RUN_ROUTE",
+        documentName: "routeId",
+        relatedDocumentId: routeId,
+      },
+    });
 
     return res.status(httpStatus.OK).send({
       status: true,
@@ -182,6 +200,15 @@ const rateRoute = async (params, res) => {
       },
       { new: true }
     );
+    EVENT.emit("update-activity-log", {
+      userId: userId,
+      message: "You rated a route",
+      extraInfo: {
+        activityType: "RATE_ROUTE",
+        documentName: "reviewId",
+        relatedDocumentId: review._id,
+      },
+    });
 
     res.status(200).send({
       message: "Review added successfully",

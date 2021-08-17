@@ -29,4 +29,21 @@ router.get(
   }
 );
 
+router.get(
+  `/getUserActivityLog`,
+  [
+    AUTHENTICATE,
+    check("userId", "userId is not valid").not().isEmpty(),
+    check("page", "page is not valid").not().isEmpty(),
+    check("perPage", "perPage is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    if (HAS_ERROR(req, res) == false)
+      general_controller.getUserActivityLog(params, res);
+  }
+);
+
 module.exports = router;

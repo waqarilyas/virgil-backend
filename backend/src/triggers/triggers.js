@@ -9,3 +9,4 @@ EVENT.addListener(
   "update-route-distance-in-vehicle",
   LISTENERS.updateVehicleDistance
 );
+EVENT.addListener("update-activity-log", LISTENERS.updateActivityLog);
