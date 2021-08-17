@@ -93,6 +93,7 @@ const getSingleRoute = async (params, res) => {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
   }
 };
+
 const getUserRoutes = async (params, res) => {
   try {
     // await AUX.checkIfValidId(params.routeId, res);

@@ -13,7 +13,7 @@ const findRouteById = async (routeId) => {
 
 const getPaginatedRoutesByUserId = async (userId, perPage, page) => {
   return await Route.find({ owner: userId })
-    .limit(perPage)
+    .limit(parseInt(perPage))
     .skip(page * perPage);
 };
 const getRouteCountByOwnerId = async (userId) => {

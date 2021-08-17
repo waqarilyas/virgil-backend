@@ -106,6 +106,12 @@ const removeUserFriend = async (userId, friendId) => {
   await User.findByIdAndUpdate(userId, { $pop: { friends: friendId } });
 };
 
+const getPaginatedUsers = async (page, perPage) => {
+  return await User.find()
+    .limit(parseInt(page))
+    .skip(page * perPage);
+};
+
 module.exports = {
   createUser,
   queryUsers,
@@ -116,4 +122,5 @@ module.exports = {
   changeUserPassword,
   addToUserFriends,
   removeUserFriend,
+  getPaginatedUsers,
 };
