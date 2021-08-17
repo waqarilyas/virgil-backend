@@ -98,6 +98,14 @@ const changeUserPassword = async (email, password) => {
   return user;
 };
 
+const addToUserFriends = async (userId, friendId) => {
+  await User.findByIdAndUpdate(userId, { $push: { friends: friendId } });
+};
+
+const removeUserFriend = async (userId, friendId) => {
+  await User.findByIdAndUpdate(userId, { $pop: { friends: friendId } });
+};
+
 module.exports = {
   createUser,
   queryUsers,
@@ -106,4 +114,6 @@ module.exports = {
   updateUserById,
   deleteUserById,
   changeUserPassword,
+  addToUserFriends,
+  removeUserFriend,
 };
