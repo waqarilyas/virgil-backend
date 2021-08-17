@@ -53,4 +53,20 @@ router.get(
   }
 );
 
+router.get(
+  `/getAllUsers`,
+  [
+    AUTHENTICATE,
+    check("page", "page is not valid").not().isEmpty(),
+    check("perPage", "perPage is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    if (HAS_ERROR(req, res) == false) {
+      const params = matchedData(req, {
+        onlyValidData: true,
+      });
+      user_controller.getAllUsers(params, res);
+    }
+  }
+);
 module.exports = router;
