@@ -58,6 +58,16 @@ const vehicleRegistration = async (params, files, res) => {
     }
 
     EVENT.emit("update-vehicle-in-user", vehicle._id, params.userId);
+    EVENT.emit("update-activity-log", {
+      userId: params.userId,
+      message: "You saved a new vehicle",
+      extraInfo: {
+        activityType: "SAVE_VEHICLE",
+        documentName: "vehicleId",
+        relatedDocumentId: vehicle._id,
+      },
+    });
+
     res.status(httpStatus.OK).send({
       status: true,
       message: "Vehicle registered successfully",

@@ -103,7 +103,7 @@ const addToUserFriends = async (userId, friendId) => {
 };
 
 const removeUserFriend = async (userId, friendId) => {
-  await User.findByIdAndUpdate(userId, { $pop: { friends: friendId } });
+  await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } });
 };
 
 const getPaginatedUsers = async (page, perPage) => {

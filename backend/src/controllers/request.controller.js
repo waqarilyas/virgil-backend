@@ -44,6 +44,17 @@ const sendFriendRequest = async (params, res) => {
 
     params.type = "FriendRequest";
     await saveRequest(params);
+
+    EVENT.emit("update-activity-log", {
+      userId: requestFrom,
+      message: "You sent a friend request",
+      extraInfo: {
+        activityType: "SEND_REQUEST",
+        documentName: "FriendId",
+        relatedDocumentId: requestTo,
+      },
+    });
+
     res.status(200).send({
       message: "Friend Request sent successfully",
       status: true,
@@ -62,6 +73,16 @@ const acceptRejectFriendRequest = async (params, res) => {
     if (operation === "REJECT") {
       await changeRequestStatus(requestId, "REJECTED");
       await removeUserFriend(request.requestFrom, request.requestTo);
+      EVENT.emit("update-activity-log", {
+        userId: request.requestTo,
+        message: "You rejected friend request",
+        extraInfo: {
+          activityType: "REQUEST_REJECT",
+          documentName: "senderId",
+          relatedDocumentId: request.requestFrom,
+        },
+      });
+
       return res.status(200).send({
         message: "Friend Request rejected succesfully",
         status: true,
@@ -70,6 +91,16 @@ const acceptRejectFriendRequest = async (params, res) => {
       await changeRequestStatus(requestId, "ACCEPTED");
       await addToUserFriends(request.requestFrom, request.requestTo);
       await addToUserFriends(request.requestTo, request.requestFrom);
+
+      EVENT.emit("update-activity-log", {
+        userId: request.requestTo,
+        message: "You accepted friend request",
+        extraInfo: {
+          activityType: "REQUEST_ACCEPT",
+          documentName: "senderId",
+          relatedDocumentId: request.requestFrom,
+        },
+      });
 
       return res.status(200).send({
         message: "Friend Request accepted successfully",
