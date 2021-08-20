@@ -15,7 +15,7 @@ exports.uploadToAws = function (pdfBuffer, filename, contentType) {
         Key: `${CONFIG.DB_NAME}/${filename}`,
         Body: base64Data,
         ACL: "public-read",
-        // ContentEncoding: 'base64', // required
+        ContentEncoding: "base64", // required
         // ContentType: `application/pdf`
         ContentType: contentType,
       };

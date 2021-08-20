@@ -33,7 +33,7 @@ const getUserActivityLog = async (params, res) => {
   try {
     const { userId, page, perPage } = params;
 
-    const log = await ActivityLog.find({ userId: userId });
+    const log = await ActivityLog.find({ userId: userId }).lean();
 
     res.status(200).send({
       status: true,
