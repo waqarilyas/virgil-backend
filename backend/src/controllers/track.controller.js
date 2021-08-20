@@ -31,6 +31,8 @@ const saveTrack = async (params, files, res) => {
       owner,
       routeLength,
       vehicleId,
+      routeSnap,
+      imageType,
     } = params;
 
     const desc = JSON.parse(descriptors);
@@ -45,11 +47,11 @@ const saveTrack = async (params, files, res) => {
       routeLength,
     };
     let rt = await saveRoute(veh);
-    if (files[0]) {
+    if (routeSnap) {
       const photo = await AUX.uploadToAws(
-        files[0].buffer,
-        rt._id,
-        files[0].mimetype
+        routeSnap,
+        `routes/${rt._id}`,
+        imageType
       );
       const updatedRoute = await Route.findByIdAndUpdate(
         rt._id,

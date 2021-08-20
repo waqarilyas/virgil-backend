@@ -119,6 +119,7 @@ router.post(
     check("model", "model is not valid").not().isEmpty(),
     check("nickName", "NickName  is not valid").optional(),
     check("engineSize", "engineSize  is not valid").optional(),
+    check("imageType", "imageType  is not valid").optional(),
   ],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
