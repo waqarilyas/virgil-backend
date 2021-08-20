@@ -40,14 +40,18 @@ const getUserVehicles = async (params, res) => {
 const vehicleRegistration = async (params, files, res) => {
   try {
     const ph = params.photo;
+    const type = params.imageType;
+
     delete params["photo"];
+    delete params["imageType"];
+
     let vehicle = await saveVehicle(params);
     if (ph) {
-      let buf = Buffer.from(
-        ph.replace(/^data:image\/\w+;base64,/, ""),
-        "base64"
+      const photo = await AUX.uploadToAws(
+        ph,
+        `vehicles/cover/${vehicle._id}`,
+        type
       );
-      const photo = await AUX.uploadToAws(buf, vehicle._id, "image/jpg");
       const updatedVehicle = await Vehicle.findByIdAndUpdate(
         vehicle._id,
         {
