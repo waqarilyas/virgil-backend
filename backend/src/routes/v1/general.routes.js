@@ -46,4 +46,16 @@ router.get(
   }
 );
 
+router.post(
+  `/testNotification`,
+  [check("deviceId", "deviceId is not valid").not().isEmpty()],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    if (HAS_ERROR(req, res) == false) params.userId = req.userId;
+    general_controller.notificationTest(params, res);
+  }
+);
+
 module.exports = router;

@@ -47,6 +47,7 @@ const saveTrack = async (params, files, res) => {
       routeLength,
     };
     let rt = await saveRoute(veh);
+
     if (routeSnap) {
       const photo = await AUX.uploadToAws(
         routeSnap,

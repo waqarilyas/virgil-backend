@@ -2,7 +2,10 @@ const { User, Vehicle } = require("../models");
 const Route = require("../models/Route.model");
 const { updateUserById } = require("../services/user.service");
 const { saveNewActivityLog } = require("../services/activityLog.service");
-const https = require("https");
+const { saveNotification } = require("../services/notification.service");
+
+const axios = require("axios");
+const { FIREBASE_SERVER_KEY } = require("../config/default");
 
 const updateUserVehicle = async (vehicleId, userid) => {
   await User.findByIdAndUpdate(userid, {
@@ -30,16 +33,47 @@ const updateVehicleDistance = async (vehicleId, routeLength) => {
   await Vehicle.findByIdAndUpdate(vehicleId, {
     $inc: { distanceCovered: routeLength, totalTrips: 1 },
   });
-
-  console.log("vehicle total distance and route number updated successfully");
 };
 
 const updateActivityLog = async (params) => {
   await saveNewActivityLog(params);
-  console.log("--user activity log saved successfully--");
 };
 
-const sendAndStoreNotification = async (params) => {};
+const sendAndStoreNotification = async (params) => {
+  const { token, extraData, message, userId, extraInfo } = params;
+
+  let data = JSON.stringify({
+    to: token,
+    data: extraData,
+    notification: {
+      title: "Virgil",
+      body: message,
+      mutable_content: true,
+      sound: "Tri-tone",
+      priority: "high",
+    },
+  });
+
+  const config = {
+    method: "post",
+    url: "https://fcm.googleapis.com/fcm/send",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: FIREBASE_SERVER_KEY,
+    },
+    data,
+  };
+  await axios(config);
+  console.log("--notification sent successfully--");
+
+  const notifyParams = {
+    userId,
+    message: message,
+    extraInfo,
+  };
+
+  await saveNotification(notifyParams);
+};
 
 module.exports = {
   updateUserVehicle,
