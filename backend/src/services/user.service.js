@@ -34,7 +34,7 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  return User.findById(id);
+  return User.findById(id).lean();
 };
 
 /**
@@ -43,7 +43,7 @@ const getUserById = async (id) => {
  * @returns {Promise<User>}
  */
 const getUserByEmail = async (email) => {
-  return User.findOne({ email });
+  return User.findOne({ email }).lean();
 };
 
 /**
@@ -109,7 +109,8 @@ const removeUserFriend = async (userId, friendId) => {
 const getPaginatedUsers = async (page, perPage) => {
   return await User.find()
     .limit(parseInt(page))
-    .skip(page * perPage);
+    .skip(page * perPage)
+    .lean();
 };
 
 module.exports = {

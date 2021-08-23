@@ -2,6 +2,7 @@ const { User, Vehicle } = require("../models");
 const Route = require("../models/Route.model");
 const { updateUserById } = require("../services/user.service");
 const { saveNewActivityLog } = require("../services/activityLog.service");
+const https = require("https");
 
 const updateUserVehicle = async (vehicleId, userid) => {
   await User.findByIdAndUpdate(userid, {
@@ -11,7 +12,7 @@ const updateUserVehicle = async (vehicleId, userid) => {
 };
 
 const updateUserRoute = async (routeId, userId) => {
-  let res = await User.findByIdAndUpdate(userId, {
+  await User.findByIdAndUpdate(userId, {
     $push: { routes: routeId },
   });
 
@@ -38,10 +39,13 @@ const updateActivityLog = async (params) => {
   console.log("--user activity log saved successfully--");
 };
 
+const sendAndStoreNotification = async (params) => {};
+
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
   deleteRouteFromUser,
   updateVehicleDistance,
   updateActivityLog,
+  sendAndStoreNotification,
 };

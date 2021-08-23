@@ -19,4 +19,5 @@ module.exports = {
     secretAccessKey: process.env.secretAccessKey,
     bucket: process.env.bucket,
   },
+  FIREBASE_SERVER_KEY: process.env.FIREBASE_SERVER_KEY,
 };

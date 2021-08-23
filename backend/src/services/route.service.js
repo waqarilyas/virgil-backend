@@ -8,16 +8,17 @@ const saveRoute = async (params) => {
 };
 
 const findRouteById = async (routeId) => {
-  return await Route.findById(routeId);
+  return await Route.findById(routeId).lean();
 };
 
 const getPaginatedRoutesByUserId = async (userId, perPage, page) => {
   return await Route.find({ owner: userId })
     .limit(parseInt(perPage))
-    .skip(page * perPage);
+    .skip(page * perPage)
+    .lean();
 };
 const getRouteCountByOwnerId = async (userId) => {
-  return await Route.find({ owner: userId }).count();
+  return await Route.find({ owner: userId }).countDocuments();
 };
 
 const deleteRouteById = async (routeId) => {

@@ -10,3 +10,4 @@ EVENT.addListener(
   LISTENERS.updateVehicleDistance
 );
 EVENT.addListener("update-activity-log", LISTENERS.updateActivityLog);
+EVENT.addListener("send-notification", LISTENERS.sendAndStoreNotification);

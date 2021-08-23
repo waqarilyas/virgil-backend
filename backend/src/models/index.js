@@ -4,3 +4,4 @@ module.exports.Vehicle = require("./vehicle.model");
 module.exports.Comment = require("./Comment.model");
 module.exports.Requests = require("./Requests.model");
 module.exports.ActivityLog = require("./ActivityLog.model");
+module.exports.Notification = require("./Notification.model");

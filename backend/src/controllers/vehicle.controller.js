@@ -20,11 +20,12 @@ const getUserVehicles = async (params, res) => {
   try {
     const vehicles = await Vehicle.find({ userId: params.userId })
       .limit(parseInt(params.perPage))
-      .skip(params.page * params.perPage);
+      .skip(params.page * params.perPage)
+      .lean();
 
-    const count = await Vehicle.find({ userId: params.userId }).count();
-
-    console.log(vehicles);
+    const count = await Vehicle.find({
+      userId: params.userId,
+    }).countDocuments();
 
     res.status(200).send({
       status: true,
