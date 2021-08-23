@@ -85,6 +85,7 @@ router.post(
     check("country", "Country name is not provided").not().isEmpty(),
     check("zipCode", "Zip code is not provided").not().isEmpty(),
     check("city", "City/State is not provided").not().isEmpty(),
+    check("deviceId", "deviceId is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
@@ -156,6 +157,7 @@ router.post(
     check("password", "Password must be atleast 6 characters long.").isLength({
       min: 6,
     }),
+    check("deviceId", "deviceId is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {

@@ -6,7 +6,7 @@ const saveVehicle = async (params) => {
   return await Vehicle.create(params);
 };
 const getVehicleById = async (vehicleId) => {
-  return await Vehicle.findOne({ _id: vehicleId });
+  return await Vehicle.findOne({ _id: vehicleId }).lean();
 };
 
 module.exports = {
