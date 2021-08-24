@@ -26,7 +26,7 @@ const getUser = async (params, res) => {
 
 const getAllUsers = async (params, res) => {
   try {
-    const { page, perPage } = params;
+    const { page, perPage, userId } = params;
     const users = await getPaginatedUsers(page, perPage);
     res.status(200).send({
       status: true,

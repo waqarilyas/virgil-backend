@@ -100,6 +100,12 @@ const userSchema = mongoose.Schema(
         ref: "User",
       },
     ],
+    requests: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Requests",
+      },
+    ],
   },
   {
     timestamps: true,

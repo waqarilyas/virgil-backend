@@ -24,7 +24,7 @@ const updateUserRoute = async (routeId, userId) => {
 
 const deleteRouteFromUser = async (routeId, userId) => {
   await User.findByIdAndUpdate(userId, {
-    $pop: { routes: routeId },
+    $pull: { routes: routeId },
   });
   console.log("--user route deleted successfully--");
 };
@@ -75,6 +75,12 @@ const sendAndStoreNotification = async (params) => {
   await saveNotification(notifyParams);
 };
 
+const updateRequestInUser = async (params) => {
+  await User.findOneAndUpdate(params.userId, {
+    $push: { requests: params.requestId },
+  });
+};
+
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
@@ -82,4 +88,5 @@ module.exports = {
   updateVehicleDistance,
   updateActivityLog,
   sendAndStoreNotification,
+  updateRequestInUser,
 };
