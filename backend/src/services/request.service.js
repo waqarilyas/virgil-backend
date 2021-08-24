@@ -27,7 +27,10 @@ const changeRequestStatus = async (requestId, status) => {
 };
 
 const getRequestsByRequestTo = async (requestTo) => {
-  return await Requests.find({ requestTo: requestTo, status: "notAccepted" });
+  return await Requests.find({
+    requestTo: requestTo,
+    status: "notAccepted",
+  }).populate("requestFrom");
 };
 
 module.exports = {
