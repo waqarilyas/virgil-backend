@@ -42,8 +42,24 @@ const sendFriendRequest = async (params, res) => {
       });
     }
 
+    const receiver = await User.findOne({ _id: requestTo });
+    const sender = await User.findOne({ _id: requestFrom });
+
     params.type = "FriendRequest";
     await saveRequest(params);
+
+    EVENT.emit("send-notification", {
+      userId: receiver._id,
+      token: receiver.deviceId,
+      message: `${
+        sender.firstName + " " + sender.lastName
+      } sent you a friend request`,
+      extraInfo: {
+        activityType: "SEND_REQUEST",
+        documentName: "senderId",
+        relatedDocumentId: requestFrom,
+      },
+    });
 
     EVENT.emit("update-activity-log", {
       userId: requestFrom,

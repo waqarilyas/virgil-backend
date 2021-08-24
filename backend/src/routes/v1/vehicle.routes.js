@@ -16,7 +16,6 @@ const multer = require("multer");
 
 const storage = multer.memoryStorage({
   destination: (req, file, callback) => {
-    console.log("---req---", req, ":---file---:", file);
     callback(null, "");
   },
   filename(req, file, callback) {
@@ -110,6 +109,7 @@ router.get(
 router.post(
   `/vehicleRegistration`,
   [
+    AUTHENTICATE,
     check("userId", "User uid is invalid").not().isEmpty(),
     check("email", "Email address is not valid").isEmail(),
     check("vehicleType", "Vehicle type is not valid").isIn(["car", "bike"]),
