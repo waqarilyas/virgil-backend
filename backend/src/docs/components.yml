@@ -358,6 +358,62 @@ components:
             imageType: "image/png",
           },
         ]
+    Reviews:
+      type: object
+      properties:
+        page:
+          type: string
+        comments:
+          type: array
+      example:
+        page: "0"
+        comments: []
+    ActivityLog:
+      type: object
+      properties:
+        page:
+          type: string
+        activityLog:
+          type: array
+      example:
+        page: 0
+        activityLog:
+          [
+            {
+              id: "61248003b6bd2b001613a243",
+              userId: "61110ff731fc32440f523766",
+              message: "You saved a new vehicle",
+              extraInfo:
+                {
+                  activityType: "SAVE_VEHICLE",
+                  documentName: "vehicleId",
+                  relatedDocumentId": "61248002b6bd2b001613a242",
+                },
+              createdAt: "2021-08-24T05:13:39.221Z",
+              updatedAt: "2021-08-24T05:13:39.221Z",
+              __v: 0,
+            },
+          ]
+    FriendRequests:
+      type: object
+      properties:
+        message:
+          type: string
+        requests:
+          type: array
+      example:
+        message: successfull
+        requests:
+          [
+            {
+              status: "notAccepted",
+              requestFrom: "611b5401e919885560d0bd36",
+              requestTo: "611b5412e919885560d0bd38",
+              type: "FriendRequest",
+              id: "6124cd33641a381f84c4cbac",
+            },
+          ]
+
     Token:
       type: object
       properties:
@@ -369,7 +425,6 @@ components:
       example:
         token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZWJhYzUzNDk1NGI1NDEzOTgwNmMxMTIiLCJpYXQiOjE1ODkyOTg0ODQsImV4cCI6MTU4OTMwMDI4NH0.m1U63blB0MLej_WfB7yC2FTMnCziif9X8yzwDEfJXAg
         expires: 2020-05-12T16:18:04.793Z
-
     AuthTokens:
       type: object
       properties:

@@ -425,7 +425,7 @@ router.post(
  * @swagger
  * /track/getUserListing:
  *   get:
- *     summary: get a single user by id
+ *     summary: get routes of a user
  *     tags: [Track]
  *     parameters:
  *      - in: path
@@ -440,6 +440,9 @@ router.post(
  *          type: integer
  *        required: true
  *        description: Number of Routes per page
+ *     example:
+ *        page: 0
+ *        perPage: 10
  *     responses:
  *       "200":
  *         description: OK

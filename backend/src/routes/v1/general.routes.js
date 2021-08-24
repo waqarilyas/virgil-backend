@@ -12,6 +12,43 @@ const { AUTHENTICATE } = require("../../middlewares/auth.middleware");
  *   description: General Routes Api Documentation
  */
 
+/**
+ * @swagger
+ * /general/getUserReviews:
+ *   get:
+ *     summary: get Reviews
+ *     tags: [General]
+ *     parameters:
+ *      - in: path
+ *        name: userId
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: user ID
+ *      - in: path
+ *        name: page
+ *        schema:
+ *          type: integer
+ *        required: true
+ *        description: page number
+ *      - in: path
+ *        name: perPage
+ *        schema:
+ *          type: integer
+ *        required: true
+ *        description: Number of Routes per page
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 Reviews:
+ *                   $ref: '#/components/schemas/Reviews'
+ */
+
 router.get(
   `/getUserReviews`,
   [
@@ -28,6 +65,43 @@ router.get(
     general_controller.getUserReviews(params, res);
   }
 );
+
+/**
+ * @swagger
+ * /general/getUserActivityLog:
+ *   get:
+ *     summary: get user activity log
+ *     tags: [General]
+ *     parameters:
+ *      - in: path
+ *        name: userId
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: user ID
+ *      - in: path
+ *        name: page
+ *        schema:
+ *          type: integer
+ *        required: true
+ *        description: page number
+ *      - in: path
+ *        name: perPage
+ *        schema:
+ *          type: integer
+ *        required: true
+ *        description: Number of Routes per page
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 UserActivityLog:
+ *                   $ref: '#/components/schemas/ActivityLog'
+ */
 
 router.get(
   `/getUserActivityLog`,
