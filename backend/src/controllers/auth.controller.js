@@ -16,6 +16,7 @@ const {
   removeToken,
 } = require("../services/token.service");
 const { loginUserWithEmailAndPassword } = require("../services/auth.service");
+const { AUTHENTICATE } = require("../middlewares/auth.middleware");
 
 //Simple version, without validation or sanitation
 const test = function (req, res) {
@@ -156,6 +157,18 @@ const socialLogin = async (params, res) => {
   }
 };
 
+const logout = async (params, res) => {
+  try {
+    const user = await User.findOne({ _id: params.userId });
+    await removeToken(user);
+    res.status(httpStatus.OK).send({
+      status: true,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test: test,
   register,
@@ -164,4 +177,5 @@ module.exports = {
   verifyCode,
   changePassword,
   socialLogin,
+  logout,
 };
