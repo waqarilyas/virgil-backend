@@ -8,8 +8,8 @@ const bodyParser = require("body-parser");
 /**
  * @swagger
  * tags:
- *   name: General
- *   description: General Routes Api Documentation
+ *   name: Vehicle
+ *   description: Vehicle Routes Api Documentation
  */
 
 const multer = require("multer");
@@ -26,6 +26,46 @@ const storage = multer.memoryStorage({
 
 const upload = multer({ storage }).single("photo");
 
+/**
+ * @swagger
+ * /vehicle/getSingleVehicle:
+ *   get:
+ *     summary: Get Single Vehicle
+ *     tags: [Vehicle]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - vehicleId
+ *             properties:
+ *               vehicleId:
+ *                 type: string
+ *             example:
+ *               vehicleId: '12'
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 vehicle:
+ *                   $ref: '#/components/schemas/Vehicle'
+ *       "400":
+ *         description: Invalid VehicleId
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               code: 400
+ *               message: "Invalid Vehicle ID"
+ */
+
 router.get(
   `/getSingleVehicle`,
   [AUTHENTICATE, check("vehicleId", "VehicelId is invalid").not().isEmpty()],
@@ -38,6 +78,45 @@ router.get(
     }
   }
 );
+
+/**
+ * @swagger
+ * /vehicle/getVehicles:
+ *   get:
+ *     summary: Get All Vehicles
+ *     tags: [Vehicle]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - page
+ *               - perPage
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               page:
+ *                 type: number
+ *               perPage:
+ *                 type: number
+ *             example:
+ *               userID: '61110ff731fc32440f523766'
+ *               page: 0
+ *               perPage: 10
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 allVehicles:
+ *                   $ref: '#/components/schemas/allVehicles'
+ */
 
 router.get(
   `/getVehicles`,
@@ -62,7 +141,7 @@ router.get(
  * /vehicle/vehicleRegistration:
  *   post:
  *     summary: Register vehicle
- *     tags: [General]
+ *     tags: [Vehicle]
  *     requestBody:
  *       required: true
  *       content:

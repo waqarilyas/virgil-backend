@@ -15,7 +15,7 @@ components:
         country:
           type: string
         zipCode:
-          type: string 
+          type: string
         city:
           type: string
         isEmailVerified:
@@ -25,11 +25,11 @@ components:
         role:
           type: string
           enum: [user, admin]
-        isSocial: 
+        isSocial:
           type: boolean,
-        platform: 
-           type: string,
-           enum: [google, facebook, apple]
+        platform:
+          type: string,
+          enum: [google, facebook, apple]
       example:
         id: 5ebac534954b54139806c112
         email: fake@example.com
@@ -42,6 +42,322 @@ components:
         deviceId: asgdfhagsfd787567FGHSFH
         isSocial: false
         platform: google
+    allUsers:
+      type: array
+      example:
+        [
+          {
+            id: 5ebac534954b54139806c112,
+            email: fake@example.com,
+            firstName: fake,
+            lastName: name,
+            role: user,
+            country: US,
+            zipCode: 54000,
+            isEmailVerified: false,
+            deviceId: asgdfhagsfd787567FGHSFH,
+            isSocial: false,
+            platform: google,
+          },
+          {
+            id: 89ba2r34954b54139806c112,
+            email: fake1@example.com,
+            firstName: fake1,
+            lastName: name1,
+            role: user,
+            country: US,
+            zipCode: 54000,
+            isEmailVerified: false,
+            deviceId: asg22dfhagsfd787567FGHSFH,
+            isSocial: false,
+            platform: google,
+          },
+        ]
+    allVehicles:
+      type: object
+      properties:
+        page:
+          type: number
+        totalResults:
+          type: number
+        vehicles:
+          type: array
+      example:
+        page: 0
+        totalResults: 1,
+        vehicles:
+          [
+            {
+              id: 61248002b6bd2b001613a242,
+              vehicleType: car,
+              totalTrips: 0,
+              distanceCovered: 0,
+              userId: 61110ff731fc32440f523766,
+              buildYear: 2012,
+              make: USA,
+              model: mercedez benz,
+              nickName: buggy,
+              engineSize: 1500,
+              createdAt: 2021-08-24T05:13:38.434Z,
+              updatedAt: 2021-08-24T05:13:39.104Z,
+              __v: 0,
+              photo: https://virgilapp.s3.amazonaws.com/virgilDev/vehicles/cover/61248002b6bd2b001613a242,
+            },
+          ]
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: string
+        vehicleType:
+          type: string
+        totalTrips:
+          type: number
+        distanceCovered:
+          type: number
+        userId:
+          type: string
+        buildYear:
+          type: string
+        make:
+          type: string
+        model:
+          type: string
+        nickName:
+          type: string
+        engineSize:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: number
+        photo:
+          type: string
+      example:
+        id: 61248002b6bd2b001613a242,
+        vehicleType: car,
+        totalTrips: 0,
+        distanceCovered: 0,
+        userId: 61110ff731fc32440f523766,
+        buildYear: 2012,
+        make: USA,
+        model: mercedez benz,
+        nickName: buggy,
+        engineSize: 1500,
+        createdAt: 2021-08-24T05:13:38.434Z,
+        updatedAt: 2021-08-24T05:13:39.104Z,
+        __v: 0,
+        photo: https://virgilapp.s3.amazonaws.com/virgilDev/vehicles/cover/61248002b6bd2b001613a242
+    Route:
+      type: object
+      properties:
+        id:
+          type: string
+        rideName:
+          type: string
+        descriptors:
+          type: array
+        isPublic:
+          type: boolean
+        coordinates:
+          type: array
+        riddenBy:
+          type: array
+        totalRating:
+          type: number
+        reviews:
+          type: array
+        routeSnap:
+          type: string
+        routeLength:
+          type: number
+        timeTaken:
+          type: number
+        owner:
+          type: string
+        vehicleId:
+          type: string
+        imageType:
+          type: string
+      example:
+        id: 5ebac534954b54139806c112
+        rideName: Very nice ride
+        descriptors: ["amazing", "rana"]
+        isPublic: true
+        coordinates: [{ "latitude": 24.5, "longitude": 35 }]
+        riddenBy: []
+        totalRating: 3
+        reviews: []
+        routeSnap: Alam Channa
+        routeLength: 24
+        timeTaken: 168
+        owner: 265645646464
+        vehicleId: fAYTSasdaGFDSFGDfgadsg
+        imageType: "image/png"
+    allRoutes:
+      type: object
+      properties:
+        page:
+          type: number
+        totalResults:
+          type: number
+        routes:
+          type: array
+      example:
+        page: 0
+        totalResults: 1,
+        routes:
+          [
+            {
+              id: 5ebac534954b54139806c112,
+              rideName: Very nice ride,
+              descriptors: ["amazing", "rana"],
+              isPublic: true,
+              coordinates: [{ "latitude": 24.5, "longitude": 35 }],
+              riddenBy: [],
+              totalRating: 3,
+              reviews: [],
+              routeSnap: Alam Channa,
+              routeLength: 24,
+              timeTaken: 168,
+              owner: 265645646464,
+              vehicleId: fAYTSasdaGFDSFGDfgadsg,
+              imageType: "image/png",
+            },
+            {
+              id: 5ebac534954b54139806c112,
+              rideName: Very nice ride,
+              descriptors: ["amazing", "rana"],
+              isPublic: true,
+              coordinates: [{ "latitude": 24.5, "longitude": 35 }],
+              riddenBy: [],
+              totalRating: 3,
+              reviews: [],
+              routeSnap: Alam Channa,
+              routeLength: 24,
+              timeTaken: 168,
+              owner: 265645646464,
+              vehicleId: fAYTSasdaGFDSFGDfgadsg,
+              imageType: "image/png",
+            },
+          ]
+    saveRoute:
+      type: object
+      properties:
+        message:
+          type: string
+        route:
+          type: Route
+      example:
+        message: "Route saved successfully"
+        route:
+          {
+            id: 5ebac534954b54139806c112,
+            rideName: Very nice ride,
+            descriptors: ["amazing", "rana"],
+            isPublic: true,
+            coordinates: [{ "latitude": 24.5, "longitude": 35 }],
+            riddenBy: [],
+            totalRating: 3,
+            reviews: [],
+            routeSnap: Alam Channa,
+            routeLength: 24,
+            timeTaken: 168,
+            owner: 265645646464,
+            vehicleId: fAYTSasdaGFDSFGDfgadsg,
+            imageType: "image/png",
+          }
+    runRoute:
+      type: object
+      properties:
+        message:
+          type: string
+        route:
+          type: Route
+      example:
+        message: "Route ran successfully"
+        route:
+          {
+            id: 5ebac534954b54139806c112,
+            rideName: Very nice ride,
+            descriptors: ["amazing", "rana"],
+            isPublic: true,
+            coordinates: [{ "latitude": 24.5, "longitude": 35 }],
+            riddenBy: [],
+            totalRating: 3,
+            reviews: [],
+            routeSnap: Alam Channa,
+            routeLength: 24,
+            timeTaken: 168,
+            owner: 265645646464,
+            vehicleId: fAYTSasdaGFDSFGDfgadsg,
+            imageType: "image/png",
+          }
+    rateRoute:
+      type: object
+      properties:
+        message:
+          type: string
+        route:
+          type: Route
+      example:
+        message: "Review added successfully"
+        route:
+          {
+            id: 5ebac534954b54139806c112,
+            rideName: Very nice ride,
+            descriptors: ["amazing", "rana"],
+            isPublic: true,
+            coordinates: [{ "latitude": 24.5, "longitude": 35 }],
+            riddenBy: [],
+            totalRating: 3,
+            reviews: [],
+            routeSnap: Alam Channa,
+            routeLength: 24,
+            timeTaken: 168,
+            owner: 265645646464,
+            vehicleId: fAYTSasdaGFDSFGDfgadsg,
+            imageType: "image/png",
+          }
+    SinglePageRoutes:
+      type: array
+      example:
+        [
+          {
+            id: 5ebac534954b54139806c112,
+            rideName: Very nice ride,
+            descriptors: ["amazing", "rana"],
+            isPublic: true,
+            coordinates: [{ "latitude": 24.5, "longitude": 35 }],
+            riddenBy: [],
+            totalRating: 3,
+            reviews: [],
+            routeSnap: Alam Channa,
+            routeLength: 24,
+            timeTaken: 168,
+            owner: 265645646464,
+            vehicleId: fAYTSasdaGFDSFGDfgadsg,
+            imageType: "image/png",
+          },
+          {
+            id: 5ebac534954b54139806c112,
+            rideName: Very nice ride,
+            descriptors: ["amazing", "rana"],
+            isPublic: true,
+            coordinates: [{ "latitude": 24.5, "longitude": 35 }],
+            riddenBy: [],
+            totalRating: 3,
+            reviews: [],
+            routeSnap: Alam Channa,
+            routeLength: 24,
+            timeTaken: 168,
+            owner: 265645646464,
+            vehicleId: fAYTSasdaGFDSFGDfgadsg,
+            imageType: "image/png",
+          },
+        ]
     Token:
       type: object
       properties:
@@ -58,9 +374,9 @@ components:
       type: object
       properties:
         access:
-          $ref: '#/components/schemas/Token'
+          $ref: "#/components/schemas/Token"
         refresh:
-          $ref: '#/components/schemas/Token'
+          $ref: "#/components/schemas/Token"
     Error:
       type: object
       properties:
@@ -74,7 +390,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             code: 400
             message: Email already taken
@@ -83,7 +399,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             code: 401
             message: Please authenticate
@@ -92,7 +408,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             code: 403
             message: Forbidden
@@ -101,7 +417,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
           example:
             code: 404
             message: Not found
