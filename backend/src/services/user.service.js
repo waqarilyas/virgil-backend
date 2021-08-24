@@ -108,7 +108,7 @@ const removeUserFriend = async (userId, friendId) => {
 
 const getPaginatedUsers = async (page, perPage) => {
   return await User.find()
-    .limit(parseInt(page))
+    .limit(parseInt(perPage))
     .skip(page * perPage)
     .lean();
 };
