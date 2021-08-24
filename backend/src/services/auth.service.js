@@ -4,7 +4,7 @@ const userService = require("./user.service");
 
 const { tokenTypes } = require("../helpers/tokens");
 const ApiError = require("../helpers/ApiError");
-const { Token } = require("../models");
+const { Token, User } = require("../models");
 
 /**
  * Login with username and password
