@@ -3,7 +3,8 @@ const { Token, Vehicle, Requests } = require("../models");
 const ApiError = require("../helpers/ApiError");
 
 const saveRequest = async (params) => {
-  return await Requests.create(params);
+  const req = await Requests.create(params);
+  return req;
 };
 const checkIfFriendRequestExists = async (params) => {
   const res = await Requests.find({

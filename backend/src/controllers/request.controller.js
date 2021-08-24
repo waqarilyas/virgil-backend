@@ -46,6 +46,7 @@ const sendFriendRequest = async (params, res) => {
     const sender = await User.findOne({ _id: requestFrom });
 
     params.type = "FriendRequest";
+
     await saveRequest(params);
 
     EVENT.emit("send-notification", {

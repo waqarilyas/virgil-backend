@@ -3,6 +3,7 @@ const { check, matchedData } = require("express-validator");
 const { HAS_ERROR } = require("../../middlewares/error.middleware");
 const router = express.Router();
 const auth_controller = require("../../controllers/auth.controller");
+const { AUTHENTICATE } = require("../../middlewares/auth.middleware");
 
 /**
  * @swagger
@@ -330,5 +331,13 @@ router.post(
       auth_controller.changePassword(params, res);
   }
 );
+
+router.post(`/logout`, [AUTHENTICATE], (req, res, next) => {
+  const params = matchedData(req, {
+    onlyValidData: true,
+  });
+  params.userId = req.userId;
+  if (HAS_ERROR(req, res) == false) auth_controller.logout(params, res);
+});
 
 module.exports = router;
