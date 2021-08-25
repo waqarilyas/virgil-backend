@@ -43,11 +43,7 @@ const getAllUsers = async (params, res) => {
         item.status = FRIEND_STATUS.friend;
       } else if (
         currentUser?.requests.some(function (req) {
-          return (
-            req.requestTo.equals(item._id) &&
-            req.status == "notAccepted" &&
-            !req.requestTo.equals(item._id)
-          );
+          return req.requestTo.equals(item._id) && req.status == "notAccepted";
         })
       ) {
         item.status = FRIEND_STATUS.requested;
