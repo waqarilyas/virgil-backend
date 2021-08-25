@@ -113,23 +113,19 @@ router.post(
 
 /**
  * @swagger
- * /track/getSingleRoute:
+ * /track/getSingleRoute?routeId={routeId}:
  *   get:
+ *     security:
+ *      - bearerAuth: []
  *     summary: Get Single Route
  *     tags: [Track]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - routeId
- *             properties:
- *               routeId:
- *                 type: string
- *             example:
- *               routeId: '611b5f049cc4fe0016756072'
+ *     parameters:
+ *      - in: path
+ *        name: routeId
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Route ID
  *     responses:
  *       "200":
  *         description: OK
@@ -166,31 +162,31 @@ router.get(
 
 /**
  * @swagger
- * /track/getUserRoutes:
+ * /track/getUserRoutes?userId={userId}&page={page}&perPage={perPage}&:
  *   get:
+ *     security:
+ *      - bearerAuth: []
  *     summary: Get All Routes of a Specific User
  *     tags: [Track]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - page
- *               - perPage
- *             properties:
- *               userId:
- *                 type: string
- *               page:
- *                 type: number
- *               perPage:
- *                 type: number
- *             example:
- *               userID: '61110ff731fc32440f523766'
- *               page: 0
- *               perPage: 10
+ *     parameters:
+ *      - in: path
+ *        name: userId
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: User ID
+ *      - in: path
+ *        name: page
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Page Number
+ *      - in: path
+ *        name: perPage
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Number of Routes per page
  *     responses:
  *       "200":
  *         description: OK
@@ -242,8 +238,8 @@ router.get(
  *               routeId:
  *                 type: string
  *             example:
- *               userID: '61110ff731fc32440f523766'
- *               routeID: '61110ff731fc32440f523766'
+ *               routeId: '6126164818ecfb2688e7eed2'
+ *               userId: '6114c19e5b60ca001635b148'
  *     responses:
  *       "200":
  *         description: OK
@@ -276,7 +272,7 @@ router.delete(
     const params = matchedData(req, {
       onlyValidData: true,
     });
-
+    console.log("here", params);
     if (HAS_ERROR(req, res) == false) track_controller.deleteRoute(params, res);
   }
 );
@@ -308,7 +304,7 @@ router.delete(
  *               vehicleId:
  *                 type: string
  *             example:
- *               routeId: '611b5f049cc4fe0016756072'
+ *               routeId: '611b5401e919885560d0bd36'
  *               userId: '6114b125130bf70015a9dcf9'
  *               totalDistance: 25
  *               vehicleId: '611a013366fd1e2c7dc6cc89'
@@ -378,8 +374,8 @@ router.post(
  *               rating:
  *                 type: number
  *             example:
- *               routeId: '611b5f049cc4fe0016756072'
- *               userId: '6114b125130bf70015a9dcf9'
+ *               routeId: '61261b802bf2e029b4440ebf'
+ *               userId: '6114c19e5b60ca001635b148'
  *               comment: 'This is a very nice route'
  *               rating: 3
  *     responses:
@@ -423,7 +419,7 @@ router.post(
 
 /**
  * @swagger
- * /track/getUserListing:
+ * /track/getUserListing?page={page}&perPage={perPage}&:
  *   get:
  *     summary: get routes of a user
  *     tags: [Track]

@@ -14,7 +14,7 @@ const { AUTHENTICATE } = require("../../middlewares/auth.middleware");
 
 /**
  * @swagger
- * /general/getUserReviews:
+ * /general/getUserReviews?userId={userId}&page={page}&perPage={perPage}&:
  *   get:
  *     summary: get Reviews
  *     tags: [General]
@@ -68,7 +68,7 @@ router.get(
 
 /**
  * @swagger
- * /general/getUserActivityLog:
+ * /general/getUserActivityLog?userId={userId}&page={page}&perPage={perPage}&:
  *   get:
  *     summary: get user activity log
  *     tags: [General]

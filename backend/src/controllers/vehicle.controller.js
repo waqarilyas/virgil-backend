@@ -5,6 +5,7 @@ const AUX = require("../helpers/auxilaries");
 const httpStatus = require("http-status");
 
 const getVehicle = async (params, res) => {
+  console.log("here", params);
   try {
     const vehicle = await getVehicleById(params.vehicleId);
     res.status(200).send({

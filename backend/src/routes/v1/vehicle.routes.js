@@ -28,23 +28,19 @@ const upload = multer({ storage }).single("photo");
 
 /**
  * @swagger
- * /vehicle/getSingleVehicle:
+ * /vehicle/getSingleVehicle?vehicleId={vehicleId}:
  *   get:
+ *     security:
+ *      - bearerAuth: []
  *     summary: Get Single Vehicle
  *     tags: [Vehicle]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - vehicleId
- *             properties:
- *               vehicleId:
- *                 type: string
- *             example:
- *               vehicleId: '12'
+ *     parameters:
+ *      - in: path
+ *        name: vehicleId
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Vehicle ID
  *     responses:
  *       "200":
  *         description: OK
@@ -81,31 +77,31 @@ router.get(
 
 /**
  * @swagger
- * /vehicle/getVehicles:
+ * /vehicle/getVehicles?userId={userId}&page={page}&perPage={perPage}&:
  *   get:
+ *     security:
+ *      - bearerAuth: []
  *     summary: Get All Vehicles
  *     tags: [Vehicle]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - page
- *               - perPage
- *             properties:
- *               userId:
- *                 type: string
- *               page:
- *                 type: number
- *               perPage:
- *                 type: number
- *             example:
- *               userID: '61110ff731fc32440f523766'
- *               page: 0
- *               perPage: 10
+ *     parameters:
+ *      - in: path
+ *        name: userId
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: User ID
+ *      - in: path
+ *        name: page
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Page Number
+ *      - in: path
+ *        name: perPage
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Number of Vehicles per page
  *     responses:
  *       "200":
  *         description: OK
@@ -163,11 +159,17 @@ router.get(
  *                 description: must be unique
  *               country:
  *                 type: string
+ *               make:
+ *                 type: string
+ *               model:
+ *                 type: string
  *               nickName:
  *                 type: string
  *               buildYear:
  *                 type: string
  *               enginePower:
+ *                 type: string
+ *               engineSize:
  *                 type: string
  *               vehicleType:
  *                 type: string
@@ -184,6 +186,20 @@ router.get(
  *               enginePower: 122cc
  *               vehicleType: car
  *               photo: fAYTSasdaGFDSFGDfgadsg
+ *     responses:
+ *       "201":
+ *         description: Created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 vehicle:
+ *                   $ref: '#/components/schemas/Vehicle'
+ *                 tokens:
+ *                   $ref: '#/components/schemas/AuthTokens'
+ *       "400":
+ *         $ref: '#/components/responses/DuplicateEmail'
  */
 
 router.post(

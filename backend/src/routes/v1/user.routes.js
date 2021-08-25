@@ -30,23 +30,17 @@ const user_controller = require("../../controllers/user.controller");
 
 /**
  * @swagger
- * /user/getSingleUser:
+ * /user/getSingleUser?id={userId}:
  *   get:
  *     summary: Get User Information
  *     tags: [User]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *             properties:
- *               userId:
- *                 type: string
- *             example:
- *               userId: '61248002b6bd2b001613a242'
+ *     parameters:
+ *      - in: path
+ *        name: userId
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: User ID
  *     responses:
  *       "200":
  *         description: OK
@@ -83,23 +77,36 @@ router.get(
 
 /**
  * @swagger
- * /user/addFriend:
+ * /user/addFriend?id={userId}:
  *   get:
- *     summary: Add Friend
+ *     summary: Send Friend Request
  *     tags: [User]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *             properties:
- *               userId:
- *                 type: string
+ *     parameters:
+ *      - in: path
+ *        name: userId
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: User ID
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       "400":
+ *         description: Invalid UserId
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *             example:
- *               userId: '61248002b6bd2b001613a242'
+ *               code: 400
+ *               message: "Invalid UserId"
  */
 
 router.get(
@@ -117,27 +124,25 @@ router.get(
 
 /**
  * @swagger
- * /user/getAllUsers:
+ * /user/getAllUsers?page={page}&perPage={perPage}&:
  *   get:
+ *     security:
+ *      - bearerAuth: []
  *     summary: Basic Information about all the users
  *     tags: [User]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - page
- *               - perPage
- *             properties:
- *               page:
- *                 type: number
- *               perPage:
- *                 type: number
- *             example:
- *               page: 0
- *               perPage: 10
+ *     parameters:
+ *      - in: path
+ *        name: page
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Page Number
+ *      - in: path
+ *        name: perPage
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Number of Users per page
  *     responses:
  *       "200":
  *         description: OK

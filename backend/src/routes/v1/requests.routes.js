@@ -42,7 +42,7 @@ router.get(
 
 /**
  * @swagger
- * /request/sendFriendRequest:
+ * /request/sendFriendRequest?requestFrom={requestFrom}&requestTo={requestTo}&:
  *   get:
  *     summary: Send Friend Request
  *     tags: [Request]
@@ -109,7 +109,7 @@ router.get(
  *               operation:
  *                 type: string
  *             example:
- *               requestId: 611b5441e919885560d0bd3a
+ *               requestId: 61261db25ec64b2fe8f6941b
  *               operation: ACCEPT
  *     responses:
  *       "200":
