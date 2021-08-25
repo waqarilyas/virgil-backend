@@ -35,7 +35,10 @@ const getUserActivityLog = async (params, res) => {
   try {
     const { userId, page, perPage } = params;
 
-    const log = await ActivityLog.find({ userId: userId }).lean();
+    const log = await ActivityLog.find({ userId: userId })
+      .limit(parseInt(perPage))
+      .skip(page * perPage)
+      .lean();
 
     res.status(200).send({
       status: true,

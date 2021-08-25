@@ -61,7 +61,7 @@ const getAllUsers = async (params, res) => {
   }
 };
 
-const getUserFriends = async (params, req) => {
+const getUserFriends = async (params, res) => {
   try {
     const { userId, page, perPage } = params;
     const user = await User.findOne({ _id: userId }).populate({
