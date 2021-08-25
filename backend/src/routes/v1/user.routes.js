@@ -65,6 +65,7 @@ router.get(
       const params = matchedData(req, {
         onlyValidData: true,
       });
+      params.userId = req.userId;
       user_controller.getAllUsers(params, res);
     }
   }

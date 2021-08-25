@@ -1,6 +1,7 @@
 const httpStatus = require("http-status");
 const { User } = require("../models");
 const ApiError = require("../helpers/ApiError");
+const { $where } = require("../models/token.model");
 
 /**
  * Create a user
