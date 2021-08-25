@@ -30,29 +30,25 @@ const getUser = async (params, res) => {
 const getAllUsers = async (params, res) => {
   try {
     const { page, perPage, userId } = params;
-
     const currentUser = await User.findOne({ _id: userId }).populate(
       "requests"
     );
-
-    console.log("---user requests--", currentUser.requests);
-    const users = await getPaginatedUsers(page, perPage);
-
+    const users = await getPaginatedUsers(userId, page, perPage);
     users.forEach(async (item, index) => {
       if (
-        currentUser.friends.some(function (friend) {
+        currentUser?.friends.some(function (friend) {
           return friend.equals(item._id);
         })
       ) {
         item.status = FRIEND_STATUS.friend;
       } else if (
-        currentUser.requests.some(function (req) {
+        currentUser?.requests.some(function (req) {
           return req.requestTo.equals(item._id) && req.status == "notAccepted";
         })
       ) {
         item.status = FRIEND_STATUS.requested;
       } else {
-        item.status = FRIEND_STATUS.notFriend;
+        item.status = FRIEND_STATUS.anon;
       }
     });
 
@@ -65,8 +61,31 @@ const getAllUsers = async (params, res) => {
   }
 };
 
+const getUserFriends = async (params, req) => {
+  try {
+    const { userId, page, perPage } = params;
+    const user = await User.findOne({ _id: userId }).populate({
+      path: "friends",
+      options: {
+        limit: parseInt(perPage),
+        sort: { created: -1 },
+        skip: page * perPage,
+      },
+    });
+
+    res.status(200).send({
+      status: true,
+      page,
+      data: user.friends,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   getUser,
   getAllUsers,
+  getUserFriends,
 };

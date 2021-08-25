@@ -107,8 +107,8 @@ const removeUserFriend = async (userId, friendId) => {
   await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } });
 };
 
-const getPaginatedUsers = async (page, perPage) => {
-  return await User.find()
+const getPaginatedUsers = async (userId, page, perPage) => {
+  return await User.find({ _id: { $ne: userId } })
     .limit(parseInt(perPage))
     .skip(page * perPage)
     .lean();
