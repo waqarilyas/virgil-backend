@@ -20,8 +20,12 @@ const getUserVehicles = async (params, res) => {
   try {
     const vehicles = await Vehicle.find({ userId: params.userId })
       .limit(parseInt(params.perPage))
-      .skip(params.page * params.perPage);
-    const count = await Vehicle.find({ userId: params.userId }).count();
+      .skip(params.page * params.perPage)
+      .lean();
+
+    const count = await Vehicle.find({
+      userId: params.userId,
+    }).countDocuments();
 
     res.status(200).send({
       status: true,
@@ -36,13 +40,18 @@ const getUserVehicles = async (params, res) => {
 
 const vehicleRegistration = async (params, files, res) => {
   try {
-    let vehicle = await saveVehicle(params);
+    const ph = params.photo;
+    const type = params.imageType;
 
-    if (files) {
+    delete params["photo"];
+    delete params["imageType"];
+
+    let vehicle = await saveVehicle(params);
+    if (ph) {
       const photo = await AUX.uploadToAws(
-        files[0].buffer,
-        vehicle._id,
-        files[0].mimetype
+        ph,
+        `vehicles/cover/${vehicle._id}`,
+        type
       );
       const updatedVehicle = await Vehicle.findByIdAndUpdate(
         vehicle._id,
@@ -55,6 +64,16 @@ const vehicleRegistration = async (params, files, res) => {
     }
 
     EVENT.emit("update-vehicle-in-user", vehicle._id, params.userId);
+    EVENT.emit("update-activity-log", {
+      userId: params.userId,
+      message: "You saved a new vehicle",
+      extraInfo: {
+        activityType: "SAVE_VEHICLE",
+        documentName: "vehicleId",
+        relatedDocumentId: vehicle._id,
+      },
+    });
+
     res.status(httpStatus.OK).send({
       status: true,
       message: "Vehicle registered successfully",

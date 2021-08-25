@@ -33,6 +33,8 @@ router.post(
     check("routeLength", "routeLength is not valid").not().isEmpty(),
     check("timeTaken", "timeTaken is not valid").not().isEmpty(),
     check("owner", "owner is not valid").not().isEmpty(),
+    check("vehicleId", "vehicleId is not valid").not().isEmpty(),
+    check("imageType", "imageType  is not valid").optional(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {
@@ -98,6 +100,7 @@ router.post(
     check("routeId", "routeId is not valid").not().isEmpty(),
     check("userId", "userId is not valid").not().isEmpty(),
     check("totalDistance", "totalDistance is not valid").not().isEmpty(),
+    check("vehicleId", "vehicleId is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {
@@ -123,6 +126,22 @@ router.post(
     });
 
     if (HAS_ERROR(req, res) == false) track_controller.rateRoute(params, res);
+  }
+);
+
+router.get(
+  `/getUserListing`,
+  [
+    AUTHENTICATE,
+    check("page", "page is not valid").not().isEmpty(),
+    check("perPage", "perPage is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    if (HAS_ERROR(req, res) == false) params.userId = req.userId;
+    track_controller.getUserListing(params, res);
   }
 );
 

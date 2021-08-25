@@ -1,6 +1,7 @@
 const httpStatus = require("http-status");
 const { User } = require("../models");
 const ApiError = require("../helpers/ApiError");
+const { $where } = require("../models/token.model");
 
 /**
  * Create a user
@@ -34,7 +35,7 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  return User.findById(id);
+  return User.findById(id).lean();
 };
 
 /**
@@ -98,6 +99,21 @@ const changeUserPassword = async (email, password) => {
   return user;
 };
 
+const addToUserFriends = async (userId, friendId) => {
+  await User.findByIdAndUpdate(userId, { $push: { friends: friendId } });
+};
+
+const removeUserFriend = async (userId, friendId) => {
+  await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } });
+};
+
+const getPaginatedUsers = async (userId, page, perPage) => {
+  return await User.find({ _id: { $ne: userId } })
+    .limit(parseInt(perPage))
+    .skip(page * perPage)
+    .lean();
+};
+
 module.exports = {
   createUser,
   queryUsers,
@@ -106,4 +122,7 @@ module.exports = {
   updateUserById,
   deleteUserById,
   changeUserPassword,
+  addToUserFriends,
+  removeUserFriend,
+  getPaginatedUsers,
 };

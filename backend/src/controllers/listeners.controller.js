@@ -1,5 +1,11 @@
-const { User } = require("../models");
+const { User, Vehicle } = require("../models");
+const Route = require("../models/Route.model");
 const { updateUserById } = require("../services/user.service");
+const { saveNewActivityLog } = require("../services/activityLog.service");
+const { saveNotification } = require("../services/notification.service");
+
+const axios = require("axios");
+const { FIREBASE_SERVER_KEY } = require("../config/default");
 
 const updateUserVehicle = async (vehicleId, userid) => {
   await User.findByIdAndUpdate(userid, {
@@ -9,22 +15,78 @@ const updateUserVehicle = async (vehicleId, userid) => {
 };
 
 const updateUserRoute = async (routeId, userId) => {
-  let res = await User.findByIdAndUpdate(userId, {
+  await User.findByIdAndUpdate(userId, {
     $push: { routes: routeId },
   });
 
-  console.log("--user route updated successfully--", res);
+  console.log("--user route updated successfully--");
 };
 
 const deleteRouteFromUser = async (routeId, userId) => {
   await User.findByIdAndUpdate(userId, {
-    $pop: { routes: routeId },
+    $pull: { routes: routeId },
   });
   console.log("--user route deleted successfully--");
+};
+
+const updateVehicleDistance = async (vehicleId, routeLength) => {
+  await Vehicle.findByIdAndUpdate(vehicleId, {
+    $inc: { distanceCovered: routeLength, totalTrips: 1 },
+  });
+};
+
+const updateActivityLog = async (params) => {
+  await saveNewActivityLog(params);
+};
+
+const sendAndStoreNotification = async (params) => {
+  const { token, extraData, message, userId, extraInfo } = params;
+
+  let data = JSON.stringify({
+    to: token,
+    data: extraData,
+    notification: {
+      title: "Virgil",
+      body: message,
+      mutable_content: true,
+      sound: "Tri-tone",
+      priority: "high",
+    },
+  });
+
+  const config = {
+    method: "post",
+    url: "https://fcm.googleapis.com/fcm/send",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: FIREBASE_SERVER_KEY,
+    },
+    data,
+  };
+  await axios(config);
+  console.log("--notification sent successfully--");
+
+  const notifyParams = {
+    userId,
+    message: message,
+    extraInfo,
+  };
+
+  await saveNotification(notifyParams);
+};
+
+const updateRequestInUser = async (params) => {
+  await User.findOneAndUpdate(params.userId, {
+    $push: { requests: params.requestId },
+  });
 };
 
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
   deleteRouteFromUser,
+  updateVehicleDistance,
+  updateActivityLog,
+  sendAndStoreNotification,
+  updateRequestInUser,
 };

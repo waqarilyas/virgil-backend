@@ -4,20 +4,24 @@ const { isValidObjectId } = require("mongoose");
 const CONFIG = require("../config/default");
 const MAILER = require("../config/mailer.config");
 
-exports.uploadToAws = function (pdfBuffer, filename, contentType) {
+exports.uploadToAws = function (photo, filename, type) {
   return new Promise((resolve, reject) => {
     try {
+      let buffer = Buffer.from(
+        photo.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+
       const s3 = new AWS.S3();
-      const base64Data = pdfBuffer;
+      const base64Data = buffer;
 
       const params = {
         Bucket: CONFIG.AWS.bucket,
         Key: `${CONFIG.DB_NAME}/${filename}`,
         Body: base64Data,
         ACL: "public-read",
-        // ContentEncoding: 'base64', // required
-        // ContentType: `application/pdf`
-        ContentType: contentType,
+        ContentEncoding: "base64",
+        ContentType: type,
       };
       s3.upload(params, (err, data) => {
         if (err) {

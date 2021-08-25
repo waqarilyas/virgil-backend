@@ -94,6 +94,18 @@ const userSchema = mongoose.Schema(
         ref: "Route",
       },
     ],
+    friends: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "User",
+      },
+    ],
+    requests: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Requests",
+      },
+    ],
   },
   {
     timestamps: true,

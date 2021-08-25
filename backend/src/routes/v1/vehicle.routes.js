@@ -108,9 +108,8 @@ router.get(
 
 router.post(
   `/vehicleRegistration`,
-
   [
-    upload,
+    AUTHENTICATE,
     check("userId", "User uid is invalid").not().isEmpty(),
     check("email", "Email address is not valid").isEmail(),
     check("vehicleType", "Vehicle type is not valid").isIn(["car", "bike"]),
@@ -120,13 +119,14 @@ router.post(
     check("model", "model is not valid").not().isEmpty(),
     check("nickName", "NickName  is not valid").optional(),
     check("engineSize", "engineSize  is not valid").optional(),
+    check("imageType", "imageType  is not valid").optional(),
   ],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
       const params = matchedData(req, {
         onlyValidData: true,
       });
-      vehicle_controller.vehicleRegistration(params, req.file, res);
+      vehicle_controller.vehicleRegistration(params, req.files, res);
     }
   }
 );

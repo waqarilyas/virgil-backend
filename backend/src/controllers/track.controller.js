@@ -28,27 +28,31 @@ const saveTrack = async (params, files, res) => {
       descriptors,
       isPublic,
       coordinates,
-      distanceCovered,
       owner,
-
       routeLength,
+      vehicleId,
+      routeSnap,
+      imageType,
     } = params;
+
+    const desc = JSON.parse(descriptors);
+    const coords = JSON.parse(coordinates);
+
     const veh = {
       rideName,
-      descriptors,
+      descriptors: desc,
       isPublic,
-      coordinates,
-      distanceCovered,
+      coordinates: coords,
       owner,
-
       routeLength,
     };
     let rt = await saveRoute(veh);
-    if (files[0]) {
+
+    if (routeSnap) {
       const photo = await AUX.uploadToAws(
-        files[0].buffer,
-        rt._id,
-        files[0].mimetype
+        routeSnap,
+        `routes/${rt._id}`,
+        imageType
       );
       const updatedRoute = await Route.findByIdAndUpdate(
         rt._id,
@@ -61,6 +65,16 @@ const saveTrack = async (params, files, res) => {
     }
 
     EVENT.emit("update-route-in-user", rt._id, owner);
+    EVENT.emit("update-route-distance-in-vehicle", vehicleId, routeLength);
+    EVENT.emit("update-activity-log", {
+      userId: owner,
+      message: "You saved a new route",
+      extraInfo: {
+        activityType: "SAVE_NEW_ROUTE",
+        documentName: "routeId",
+        relatedDocumentId: rt._id,
+      },
+    });
 
     res.status(200).send({
       message: "Route saved successfully",
@@ -91,6 +105,7 @@ const getSingleRoute = async (params, res) => {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
   }
 };
+
 const getUserRoutes = async (params, res) => {
   try {
     // await AUX.checkIfValidId(params.routeId, res);
@@ -137,7 +152,7 @@ const deleteRoute = async (params, res) => {
 
 const runRoute = async (params, res) => {
   try {
-    const { routeId, userId, totalDistance } = params;
+    const { routeId, userId, totalDistance, vehicleId } = params;
 
     const updatedRoute = await Route.findByIdAndUpdate(
       routeId,
@@ -147,6 +162,16 @@ const runRoute = async (params, res) => {
       },
       { new: true }
     );
+    EVENT.emit("update-route-distance-in-vehicle", vehicleId, totalDistance);
+    EVENT.emit("update-activity-log", {
+      userId: userId,
+      message: "You ran a route",
+      extraInfo: {
+        activityType: "RUN_ROUTE",
+        documentName: "routeId",
+        relatedDocumentId: routeId,
+      },
+    });
 
     return res.status(httpStatus.OK).send({
       status: true,
@@ -170,14 +195,46 @@ const rateRoute = async (params, res) => {
     });
     const route = await Route.findById(routeId);
 
-    const averageRating = (route.totalRating + rating) / 5;
-    const updatedRoute = await Route.findByIdAndUpdate(routeId, {
-      totalRating: averageRating,
+    const averageRating = (route.totalRating * 5 + rating) / 5;
+    const updatedRoute = await Route.findByIdAndUpdate(
+      routeId,
+      {
+        totalRating: route.totalRating == 0 ? rating : averageRating,
+      },
+      { new: true }
+    );
+    EVENT.emit("update-activity-log", {
+      userId: userId,
+      message: "You rated a route",
+      extraInfo: {
+        activityType: "RATE_ROUTE",
+        documentName: "reviewId",
+        relatedDocumentId: review._id,
+      },
     });
 
     res.status(200).send({
       message: "Review added successfully",
       route: updatedRoute,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const getUserListing = async (params, res) => {
+  try {
+    const { perPage, page } = params;
+
+    const routes = await Route.find({})
+      .sort({ createdAt: -1 })
+      .limit(parseInt(perPage))
+      .skip(page * perPage)
+      .lean(["totalRating"]);
+
+    res.status(200).send({
+      status: true,
+      routes,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
@@ -192,4 +249,5 @@ module.exports = {
   deleteRoute,
   runRoute,
   rateRoute,
+  getUserListing,
 };

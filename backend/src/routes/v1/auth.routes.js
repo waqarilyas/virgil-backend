@@ -3,6 +3,7 @@ const { check, matchedData } = require("express-validator");
 const { HAS_ERROR } = require("../../middlewares/error.middleware");
 const router = express.Router();
 const auth_controller = require("../../controllers/auth.controller");
+const { AUTHENTICATE } = require("../../middlewares/auth.middleware");
 
 /**
  * @swagger
@@ -85,6 +86,7 @@ router.post(
     check("country", "Country name is not provided").not().isEmpty(),
     check("zipCode", "Zip code is not provided").not().isEmpty(),
     check("city", "City/State is not provided").not().isEmpty(),
+    check("deviceId", "deviceId is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
@@ -156,6 +158,7 @@ router.post(
     check("password", "Password must be atleast 6 characters long.").isLength({
       min: 6,
     }),
+    check("deviceId", "deviceId is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {
@@ -328,5 +331,13 @@ router.post(
       auth_controller.changePassword(params, res);
   }
 );
+
+router.post(`/logout`, [AUTHENTICATE], (req, res, next) => {
+  const params = matchedData(req, {
+    onlyValidData: true,
+  });
+  params.userId = req.userId;
+  if (HAS_ERROR(req, res) == false) auth_controller.logout(params, res);
+});
 
 module.exports = router;
