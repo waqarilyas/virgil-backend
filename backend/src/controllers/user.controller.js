@@ -43,11 +43,7 @@ const getAllUsers = async (params, res) => {
         item.status = FRIEND_STATUS.friend;
       } else if (
         currentUser?.requests.some(function (req) {
-          return (
-            req.requestTo.equals(item._id) &&
-            req.status == "notAccepted" &&
-            !req.requestTo.equals(item._id)
-          );
+          return req.requestTo.equals(item._id) && req.status == "notAccepted";
         })
       ) {
         item.status = FRIEND_STATUS.requested;
@@ -65,7 +61,7 @@ const getAllUsers = async (params, res) => {
   }
 };
 
-const getUserFriends = async (params, req) => {
+const getUserFriends = async (params, res) => {
   try {
     const { userId, page, perPage } = params;
     const user = await User.findOne({ _id: userId }).populate({
