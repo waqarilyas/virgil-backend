@@ -1,7 +1,8 @@
 const FRIEND_STATUS = {
   friend: "FRIEND",
-  notFriend: "NOTFRIEND",
+  anon: "ANONYMOUS",
   requested: "REQUESTED",
+  currentUser: "CURRENT_USER",
 };
 
 module.exports = {
