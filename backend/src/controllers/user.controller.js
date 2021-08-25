@@ -1,8 +1,11 @@
 const httpStatus = require("http-status");
+const { Mongoose } = require("mongoose");
 const AUX = require("../helpers/auxilaries");
-const { Vehicle, User } = require("../models");
+const { Vehicle, User, Requests } = require("../models");
+var mongoose = require("mongoose");
 
 const { getUserById, getPaginatedUsers } = require("../services/user.service");
+const { FRIEND_STATUS } = require("../helpers/enums");
 
 const test = (params, res) => {
   return res.status(200).send({
@@ -27,7 +30,32 @@ const getUser = async (params, res) => {
 const getAllUsers = async (params, res) => {
   try {
     const { page, perPage, userId } = params;
+
+    const currentUser = await User.findOne({ _id: userId }).populate(
+      "requests"
+    );
+
+    console.log("---user requests--", currentUser.requests);
     const users = await getPaginatedUsers(page, perPage);
+
+    users.forEach(async (item, index) => {
+      if (
+        currentUser.friends.some(function (friend) {
+          return friend.equals(item._id);
+        })
+      ) {
+        item.status = FRIEND_STATUS.friend;
+      } else if (
+        currentUser.requests.some(function (req) {
+          return req.requestTo.equals(item._id) && req.status == "notAccepted";
+        })
+      ) {
+        item.status = FRIEND_STATUS.requested;
+      } else {
+        item.status = FRIEND_STATUS.notFriend;
+      }
+    });
+
     res.status(200).send({
       status: true,
       users,

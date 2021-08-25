@@ -50,7 +50,7 @@ const sendFriendRequest = async (params, res) => {
     const req = await saveRequest(params);
 
     EVENT.emit("update-request-in-user", {
-      userId,
+      requestFrom,
       requestId: req._id,
     });
 
