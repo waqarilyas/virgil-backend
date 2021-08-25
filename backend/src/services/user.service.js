@@ -111,6 +111,7 @@ const getPaginatedUsers = async (userId, page, perPage) => {
   return await User.find({ _id: { $ne: userId } })
     .limit(parseInt(perPage))
     .skip(page * perPage)
+    .populate('requests')
     .lean();
 };
 
