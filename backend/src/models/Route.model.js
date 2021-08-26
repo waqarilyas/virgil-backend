@@ -66,7 +66,7 @@ const routeSchema = mongoose.Schema(
     stops: [
       {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: "Stops",
+        ref: "Stop",
       },
     ],
   },
