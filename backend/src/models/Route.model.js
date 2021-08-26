@@ -51,11 +51,12 @@ const routeSchema = mongoose.Schema(
       required: false,
       default: 0,
     },
-    reviews: {
-      type: Array,
-      default: [],
-      required: false,
-    },
+    reviews: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Comment",
+      },
+    ],
   },
   {
     timestamps: true,
