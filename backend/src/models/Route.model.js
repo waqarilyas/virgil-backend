@@ -63,6 +63,12 @@ const routeSchema = mongoose.Schema(
       required: false,
       default: Date.now,
     },
+    stops: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Stops",
+      },
+    ],
   },
   {
     timestamps: true,

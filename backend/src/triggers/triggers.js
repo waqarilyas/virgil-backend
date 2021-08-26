@@ -12,3 +12,4 @@ EVENT.addListener(
 EVENT.addListener("update-activity-log", LISTENERS.updateActivityLog);
 EVENT.addListener("send-notification", LISTENERS.sendAndStoreNotification);
 EVENT.addListener("update-request-in-user", LISTENERS.updateRequestInUser);
+EVENT.addListener("save-route-stops", LISTENERS.saveRouteStops);

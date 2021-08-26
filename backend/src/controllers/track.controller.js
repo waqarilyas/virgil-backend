@@ -33,16 +33,18 @@ const saveTrack = async (params, files, res) => {
       vehicleId,
       routeSnap,
       imageType,
+      stops,
     } = params;
 
     const desc = JSON.parse(descriptors);
     const coords = JSON.parse(coordinates);
+    const parsedStops = JSON.parse(stops);
 
     const veh = {
       rideName,
-      descriptors: desc,
+      descriptors,
       isPublic,
-      coordinates: coords,
+      coordinates,
       owner,
       routeLength,
     };
@@ -63,7 +65,10 @@ const saveTrack = async (params, files, res) => {
       );
       rt = updatedRoute;
     }
-
+    EVENT.emit("save-route-stops", {
+      routeId: rt._id,
+      stops: parsedStops,
+    });
     EVENT.emit("update-route-in-user", rt._id, owner);
     EVENT.emit("update-route-distance-in-vehicle", vehicleId, routeLength);
     EVENT.emit("update-activity-log", {

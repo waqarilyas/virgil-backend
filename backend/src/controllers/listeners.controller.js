@@ -1,4 +1,4 @@
-const { User, Vehicle } = require("../models");
+const { User, Vehicle, Stop } = require("../models");
 const Route = require("../models/Route.model");
 const { updateUserById } = require("../services/user.service");
 const { saveNewActivityLog } = require("../services/activityLog.service");
@@ -81,6 +81,27 @@ const updateRequestInUser = async (params) => {
   });
 };
 
+const saveRouteStops = async (params) => {
+  const { routeId, stops } = params;
+
+  if (stops.length > 0) {
+    stops.forEach(async (st) => {
+      const { coords, name, type } = st;
+      const stopParams = {
+        routeId,
+        coords,
+        name,
+        type,
+      };
+      const stp = await Stop.create(stopParams);
+      await Route.findOneAndUpdate(
+        { _id: routeId },
+        { $push: { stops: stp._id } }
+      );
+    });
+  }
+};
+
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
@@ -89,4 +110,5 @@ module.exports = {
   updateActivityLog,
   sendAndStoreNotification,
   updateRequestInUser,
+  saveRouteStops,
 };
