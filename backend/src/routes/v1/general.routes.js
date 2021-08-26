@@ -24,8 +24,8 @@ router.get(
     const params = matchedData(req, {
       onlyValidData: true,
     });
-    if (HAS_ERROR(req, res) == false) params.userId = req.userId;
-    general_controller.getUserReviews(params, res);
+    if (HAS_ERROR(req, res) == false)
+      general_controller.getUserReviews(params, res);
   }
 );
 

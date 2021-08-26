@@ -19,7 +19,8 @@ const getUserReviews = async (params, res) => {
       .sort({ createdAt: -1 })
       .limit(parseInt(perPage))
       .skip(page * perPage)
-      .lean();
+      .lean()
+      .populate("route");
 
     res.status(200).send({
       status: true,

@@ -106,6 +106,12 @@ const userSchema = mongoose.Schema(
         ref: "Requests",
       },
     ],
+    favouriteRoutes: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Route",
+      },
+    ],
   },
   {
     timestamps: true,

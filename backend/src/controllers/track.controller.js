@@ -185,25 +185,25 @@ const runRoute = async (params, res) => {
 
 const rateRoute = async (params, res) => {
   try {
-    const { userId, routeId, comment, rating } = params;
+    const { userId, route, comment, rating } = params;
 
     const review = await Comment.create({
       userId,
-      routeId,
+      route,
       message: comment,
       rating,
     });
-    const route = await Route.findById(routeId).populate("reviews");
+    const rt = await Route.findById(route).populate("reviews");
 
-    const tRating = route.reviews.reduce((a, b) => +a + +b.rating, 0);
+    const tRating = rt.reviews.reduce((a, b) => +a + +b.rating, 0);
 
-    const averageRating = (tRating + rating) / (route.reviews.length + 1);
+    const averageRating = (tRating + rating) / (rt.reviews.length + 1);
 
     const updatedRoute = await Route.findOneAndUpdate(
-      { _id: routeId },
+      { _id: route },
       {
         $push: { reviews: review._id },
-        totalRating: averageRating,
+        totalRating: averageRating.toFixed(0),
       },
       { new: true }
     );
@@ -245,6 +245,43 @@ const getUserListing = async (params, res) => {
   }
 };
 
+const addToFavourite = async (params, res) => {
+  try {
+    const { userId, routeId } = params;
+
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $push: { favouriteRoutes: routeId } },
+      { new: true }
+    ).populate("favouriteRoutes");
+
+    res.status(200).send({
+      status: true,
+      user,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const getUserFavouriteRoutes = async (params, res) => {
+  try {
+    const { userId, page, perPage } = params;
+
+    const user = await User.findOne({ _id: userId })
+      .populate("favouriteRoutes")
+      .limit(parseInt(perPage))
+      .skip(page * perPage);
+
+    res.status(200).send({
+      status: true,
+      data: user.favouriteRoutes,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   saveTrack,
@@ -254,4 +291,6 @@ module.exports = {
   runRoute,
   rateRoute,
   getUserListing,
+  addToFavourite,
+  getUserFavouriteRoutes,
 };
