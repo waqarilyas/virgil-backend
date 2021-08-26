@@ -282,6 +282,24 @@ const getUserFavouriteRoutes = async (params, res) => {
   }
 };
 
+const getMapData = async (params, res) => {
+  try {
+    const { userId } = params;
+
+    const data = await Route.find({ _id: { $ne: userId } }).select([
+      "coordinates",
+      "rideName",
+    ]);
+
+    res.status(200).send({
+      status: true,
+      data,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   saveTrack,
@@ -293,4 +311,5 @@ module.exports = {
   getUserListing,
   addToFavourite,
   getUserFavouriteRoutes,
+  getMapData,
 };

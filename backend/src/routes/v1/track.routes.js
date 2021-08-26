@@ -175,4 +175,12 @@ router.get(
       track_controller.getUserFavouriteRoutes(params, res);
   }
 );
+
+router.get(`/getMapData`, [AUTHENTICATE], (req, res, next) => {
+  const params = matchedData(req, {
+    onlyValidData: true,
+  });
+
+  if (HAS_ERROR(req, res) == false) track_controller.getMapData(params, res);
+});
 module.exports = router;
