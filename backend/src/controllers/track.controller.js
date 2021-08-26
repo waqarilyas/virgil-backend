@@ -157,8 +157,9 @@ const runRoute = async (params, res) => {
     const updatedRoute = await Route.findByIdAndUpdate(
       routeId,
       {
+        lastRidden: Date.now(),
         $inc: { timesTaken: 1, totalDistanceCovered: totalDistance },
-        $push: { riddenBy: userId },
+        $addToSet: { riddenBy: userId },
       },
       { new: true }
     );
@@ -231,10 +232,12 @@ const getUserListing = async (params, res) => {
     const { perPage, page } = params;
 
     const routes = await Route.find({})
-      .sort({ createdAt: -1 })
+      .where("isPublic")
+      .equals(true)
+      .sort({ timesTaken: 1 })
       .limit(parseInt(perPage))
       .skip(page * perPage)
-      .lean(["totalRating"]);
+      .lean();
 
     res.status(200).send({
       status: true,
