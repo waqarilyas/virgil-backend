@@ -21,6 +21,7 @@ const routeSchema = mongoose.Schema(
     routeSnap: {
       type: String,
       required: false,
+      default: 0,
     },
     routeLength: {
       type: String,
@@ -32,7 +33,7 @@ const routeSchema = mongoose.Schema(
       required: false,
       trim: true,
     },
-    timeTaken: {
+    timesTaken: {
       type: Number,
       required: false,
     },
@@ -57,6 +58,11 @@ const routeSchema = mongoose.Schema(
         ref: "Comment",
       },
     ],
+    lastRidden: {
+      type: Date,
+      required: false,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
