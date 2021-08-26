@@ -193,13 +193,17 @@ const rateRoute = async (params, res) => {
       message: comment,
       rating,
     });
-    const route = await Route.findById(routeId);
+    const route = await Route.findById(routeId).populate("reviews");
 
-    const averageRating = (route.totalRating * 5 + rating) / 5;
-    const updatedRoute = await Route.findByIdAndUpdate(
-      routeId,
+    const tRating = route.reviews.reduce((a, b) => +a + +b.rating, 0);
+
+    const averageRating = (tRating + rating) / (route.reviews.length + 1);
+
+    const updatedRoute = await Route.findOneAndUpdate(
+      { _id: routeId },
       {
-        totalRating: route.totalRating == 0 ? rating : averageRating,
+        $push: { reviews: review._id },
+        totalRating: averageRating,
       },
       { new: true }
     );
