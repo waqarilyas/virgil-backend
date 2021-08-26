@@ -42,13 +42,17 @@ const saveTrack = async (params, files, res) => {
 
     const veh = {
       rideName,
-      descriptors,
+      descriptors: desc,
       isPublic,
-      coordinates,
+      coordinates: coords,
       owner,
       routeLength,
     };
     let rt = await saveRoute(veh);
+    EVENT.emit("save-route-stops", {
+      routeId: rt._id,
+      stops: parsedStops,
+    });
 
     if (routeSnap) {
       const photo = await AUX.uploadToAws(
@@ -65,10 +69,7 @@ const saveTrack = async (params, files, res) => {
       );
       rt = updatedRoute;
     }
-    EVENT.emit("save-route-stops", {
-      routeId: rt._id,
-      stops: parsedStops,
-    });
+
     EVENT.emit("update-route-in-user", rt._id, owner);
     EVENT.emit("update-route-distance-in-vehicle", vehicleId, routeLength);
     EVENT.emit("update-activity-log", {
@@ -93,7 +94,7 @@ const saveTrack = async (params, files, res) => {
 const getSingleRoute = async (params, res) => {
   try {
     // await AUX.checkIfValidId(params.routeId, res);
-    const route = await findRouteById(params.routeId);
+    const route = await Route.findById(params.routeId).lean().populate("stops");
     if (route) {
       return res.status(httpStatus.OK).send({
         status: true,
@@ -242,7 +243,8 @@ const getUserListing = async (params, res) => {
       .sort({ timesTaken: 1 })
       .limit(parseInt(perPage))
       .skip(page * perPage)
-      .lean();
+      .lean()
+      .populate("stops");
 
     res.status(200).send({
       status: true,
@@ -294,10 +296,9 @@ const getMapData = async (params, res) => {
   try {
     const { userId } = params;
 
-    const data = await Route.find({ _id: { $ne: userId } }).select([
-      "coordinates",
-      "rideName",
-    ]);
+    const data = await Route.find({ _id: { $ne: userId } })
+      .select(["coordinates", "rideName"])
+      .populate("stops");
 
     res.status(200).send({
       status: true,
