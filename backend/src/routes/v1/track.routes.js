@@ -35,6 +35,7 @@ router.post(
     check("owner", "owner is not valid").not().isEmpty(),
     check("vehicleId", "vehicleId is not valid").not().isEmpty(),
     check("imageType", "imageType  is not valid").optional(),
+    check("stops", "stops  is not valid").optional(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {
