@@ -8,7 +8,7 @@ const commentSchema = mongoose.Schema(
       ref: "User",
       required: true,
     },
-    routeId: {
+    route: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Route",
       required: true,
