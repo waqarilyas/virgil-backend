@@ -47,9 +47,9 @@ const vehicleRegistration = async (params, files, res) => {
     delete params["imageType"];
 
     let vehicle = await saveVehicle(params);
-    if (ph) {
+    if (files[0]) {
       const photo = await AUX.uploadToAws(
-        ph,
+        files[0].buffer,
         `vehicles/cover/${vehicle._id}`,
         type
       );
