@@ -301,7 +301,8 @@ const getMapData = async (params, res) => {
       .populate("stops")
       .populate("owner", ["firstName", "lastName"])
       .where("isPublic")
-      .equals(true);
+      .equals(true)
+      .lean();
 
     res.status(200).send({
       status: true,
