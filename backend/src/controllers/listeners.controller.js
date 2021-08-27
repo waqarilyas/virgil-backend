@@ -1,8 +1,9 @@
-const { User, Vehicle } = require("../models");
+const { User, Vehicle, Stop, Comment } = require("../models");
 const Route = require("../models/Route.model");
 const { updateUserById } = require("../services/user.service");
 const { saveNewActivityLog } = require("../services/activityLog.service");
 const { saveNotification } = require("../services/notification.service");
+const AUX = require("../helpers/auxilaries");
 
 const axios = require("axios");
 const { FIREBASE_SERVER_KEY } = require("../config/default");
@@ -81,6 +82,44 @@ const updateRequestInUser = async (params) => {
   });
 };
 
+const saveRouteStops = async (params) => {
+  const { routeId, stops } = params;
+
+  if (stops.length > 0) {
+    stops.forEach(async (st) => {
+      const { coords, name, type } = st;
+      const stopParams = {
+        routeId,
+        coords,
+        name,
+        type,
+      };
+      const stp = await Stop.create(stopParams);
+      await Route.findOneAndUpdate(
+        { _id: routeId },
+        { $push: { stops: stp._id } }
+      );
+    });
+  }
+};
+
+const uploadReviewImages = async (params) => {
+  const { files, review } = params;
+  files.forEach(async (item, index) => {
+    const photo = await AUX.uploadToAws(
+      item.buffer,
+      `routes/reviews/${review}/${index}`
+    );
+
+    await Comment.findOneAndUpdate(
+      { _id: review },
+      {
+        $push: { images: photo.Location },
+      }
+    );
+  });
+};
+
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
@@ -89,4 +128,6 @@ module.exports = {
   updateActivityLog,
   sendAndStoreNotification,
   updateRequestInUser,
+  saveRouteStops,
+  uploadReviewImages,
 };

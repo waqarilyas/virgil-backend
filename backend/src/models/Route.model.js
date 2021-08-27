@@ -21,6 +21,7 @@ const routeSchema = mongoose.Schema(
     routeSnap: {
       type: String,
       required: false,
+      default: 0,
     },
     routeLength: {
       type: String,
@@ -32,7 +33,7 @@ const routeSchema = mongoose.Schema(
       required: false,
       trim: true,
     },
-    timeTaken: {
+    timesTaken: {
       type: Number,
       required: false,
     },
@@ -51,11 +52,23 @@ const routeSchema = mongoose.Schema(
       required: false,
       default: 0,
     },
-    reviews: {
-      type: Array,
-      default: [],
+    reviews: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Comment",
+      },
+    ],
+    lastRidden: {
+      type: Date,
       required: false,
+      default: Date.now,
     },
+    stops: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Stop",
+      },
+    ],
   },
   {
     timestamps: true,

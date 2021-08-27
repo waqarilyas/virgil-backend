@@ -33,10 +33,12 @@ const saveTrack = async (params, files, res) => {
       vehicleId,
       routeSnap,
       imageType,
+      stops,
     } = params;
 
     const desc = JSON.parse(descriptors);
     const coords = JSON.parse(coordinates);
+    const parsedStops = JSON.parse(stops);
 
     const veh = {
       rideName,
@@ -47,6 +49,10 @@ const saveTrack = async (params, files, res) => {
       routeLength,
     };
     let rt = await saveRoute(veh);
+    EVENT.emit("save-route-stops", {
+      routeId: rt._id,
+      stops: parsedStops,
+    });
 
     if (routeSnap) {
       const photo = await AUX.uploadToAws(
@@ -88,7 +94,7 @@ const saveTrack = async (params, files, res) => {
 const getSingleRoute = async (params, res) => {
   try {
     // await AUX.checkIfValidId(params.routeId, res);
-    const route = await findRouteById(params.routeId);
+    const route = await Route.findById(params.routeId).lean().populate("stops");
     if (route) {
       return res.status(httpStatus.OK).send({
         status: true,
@@ -157,8 +163,9 @@ const runRoute = async (params, res) => {
     const updatedRoute = await Route.findByIdAndUpdate(
       routeId,
       {
+        lastRidden: Date.now(),
         $inc: { timesTaken: 1, totalDistanceCovered: totalDistance },
-        $push: { riddenBy: userId },
+        $addToSet: { riddenBy: userId },
       },
       { new: true }
     );
@@ -183,23 +190,34 @@ const runRoute = async (params, res) => {
   }
 };
 
-const rateRoute = async (params, res) => {
+const rateRoute = async (params, files, res) => {
   try {
-    const { userId, routeId, comment, rating } = params;
+    const { userId, route, comment, rating } = params;
 
     const review = await Comment.create({
       userId,
-      routeId,
+      route,
       message: comment,
       rating,
     });
-    const route = await Route.findById(routeId);
+    const rt = await Route.findById(route).populate("reviews");
 
-    const averageRating = (route.totalRating * 5 + rating) / 5;
-    const updatedRoute = await Route.findByIdAndUpdate(
-      routeId,
+    if (files.length > 0) {
+      EVENT.emit("upload-and-save-review-images", {
+        files,
+        review: review._id,
+      });
+    }
+
+    const tRating = rt.reviews.reduce((a, b) => +a + +b.rating, 0);
+
+    const averageRating = (tRating + rating) / (rt.reviews.length + 1);
+
+    const updatedRoute = await Route.findOneAndUpdate(
+      { _id: route },
       {
-        totalRating: route.totalRating == 0 ? rating : averageRating,
+        $push: { reviews: review._id },
+        totalRating: averageRating.toFixed(0),
       },
       { new: true }
     );
@@ -227,14 +245,75 @@ const getUserListing = async (params, res) => {
     const { perPage, page } = params;
 
     const routes = await Route.find({})
-      .sort({ createdAt: -1 })
+      .where("isPublic")
+      .equals(true)
+      .sort({ timesTaken: 1 })
       .limit(parseInt(perPage))
       .skip(page * perPage)
-      .lean(["totalRating"]);
+      .lean()
+      .populate("stops");
 
     res.status(200).send({
       status: true,
       routes,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const addToFavourite = async (params, res) => {
+  try {
+    const { userId, routeId } = params;
+
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $push: { favouriteRoutes: routeId } },
+      { new: true }
+    ).populate("favouriteRoutes");
+
+    res.status(200).send({
+      status: true,
+      user,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const getUserFavouriteRoutes = async (params, res) => {
+  try {
+    const { userId, page, perPage } = params;
+
+    const user = await User.findOne({ _id: userId })
+      .populate("favouriteRoutes")
+      .limit(parseInt(perPage))
+      .skip(page * perPage);
+
+    res.status(200).send({
+      status: true,
+      data: user.favouriteRoutes,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const getMapData = async (params, res) => {
+  try {
+    const { userId } = params;
+
+    const data = await Route.find({ _id: { $ne: userId } })
+      .select(["coordinates", "rideName", "createdAt", "routeSnap"])
+      .populate("stops")
+      .populate("owner", ["firstName", "lastName"])
+      .where("isPublic")
+      .equals(true)
+      .lean();
+
+    res.status(200).send({
+      status: true,
+      data,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
@@ -250,4 +329,7 @@ module.exports = {
   runRoute,
   rateRoute,
   getUserListing,
+  addToFavourite,
+  getUserFavouriteRoutes,
+  getMapData,
 };

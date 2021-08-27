@@ -1,26 +1,34 @@
 const mongoose = require("mongoose");
 const { toJSON } = require("./plugins");
 
-const commentSchema = mongoose.Schema(
+const stopSchema = mongoose.Schema(
   {
-    userId: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    route: {
+    routeId: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Route",
       required: true,
     },
-    message: {
+    coords: {
+      latitude: {
+        type: String,
+        required: false,
+        trim: true,
+      },
+      longitude: {
+        type: String,
+        required: false,
+        trim: true,
+      },
+    },
+    name: {
       type: String,
-      required: false,
+      required: true,
       trim: true,
     },
-    rating: {
-      type: Number,
+    type: {
+      type: String,
       required: true,
+      trim: true,
     },
     images: {
       type: Array,
@@ -34,11 +42,11 @@ const commentSchema = mongoose.Schema(
 );
 
 // add plugin that converts mongoose to json
-commentSchema.plugin(toJSON);
+stopSchema.plugin(toJSON);
 
 /**
  * @typedef Comment
  */
-const Comment = mongoose.model("Comment", commentSchema);
+const Stop = mongoose.model("Stop", stopSchema);
 
-module.exports = Comment;
+module.exports = Stop;

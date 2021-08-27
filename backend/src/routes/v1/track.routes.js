@@ -35,6 +35,7 @@ router.post(
     check("owner", "owner is not valid").not().isEmpty(),
     check("vehicleId", "vehicleId is not valid").not().isEmpty(),
     check("imageType", "imageType  is not valid").optional(),
+    check("stops", "stops  is not valid").optional(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {
@@ -115,7 +116,7 @@ router.post(
   `/rateARoute`,
   [
     AUTHENTICATE,
-    check("routeId", "routeId is not valid").not().isEmpty(),
+    check("route", "routeId is not valid").not().isEmpty(),
     check("userId", "userId is not valid").not().isEmpty(),
     check("comment", "comment is not valid").not().isEmpty(),
     check("rating", "rating is not valid").not().isEmpty(),
@@ -125,7 +126,8 @@ router.post(
       onlyValidData: true,
     });
 
-    if (HAS_ERROR(req, res) == false) track_controller.rateRoute(params, res);
+    if (HAS_ERROR(req, res) == false)
+      track_controller.rateRoute(params, req.files, res);
   }
 );
 
@@ -145,4 +147,42 @@ router.get(
   }
 );
 
+router.post(
+  `/addRouteToFavourite`,
+  [AUTHENTICATE, check("routeId", "routeId is not valid").not().isEmpty()],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    params.userId = req.userId;
+    if (HAS_ERROR(req, res) == false)
+      track_controller.addToFavourite(params, res);
+  }
+);
+
+router.get(
+  `/getFavouriteRoutes`,
+  [
+    AUTHENTICATE,
+    check("userId", "userId is not valid").not().isEmpty(),
+    check("page", "page is not valid").not().isEmpty(),
+    check("perPage", "perPage is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+
+    if (HAS_ERROR(req, res) == false)
+      track_controller.getUserFavouriteRoutes(params, res);
+  }
+);
+
+router.get(`/getMapData`, [AUTHENTICATE], (req, res, next) => {
+  const params = matchedData(req, {
+    onlyValidData: true,
+  });
+
+  if (HAS_ERROR(req, res) == false) track_controller.getMapData(params, res);
+});
 module.exports = router;

@@ -7,13 +7,13 @@ const MAILER = require("../config/mailer.config");
 exports.uploadToAws = function (photo, filename, type) {
   return new Promise((resolve, reject) => {
     try {
-      let buffer = Buffer.from(
-        photo.replace(/^data:image\/\w+;base64,/, ""),
-        "base64"
-      );
+      // let buffer = Buffer.from(
+      //   photo.replace(/^data:image\/\w+;base64,/, ""),
+      //   "base64"
+      // );
 
       const s3 = new AWS.S3();
-      const base64Data = buffer;
+      const base64Data = photo;
 
       const params = {
         Bucket: CONFIG.AWS.bucket,
@@ -21,7 +21,6 @@ exports.uploadToAws = function (photo, filename, type) {
         Body: base64Data,
         ACL: "public-read",
         ContentEncoding: "base64",
-        ContentType: type,
       };
       s3.upload(params, (err, data) => {
         if (err) {
