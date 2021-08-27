@@ -111,7 +111,6 @@ router.post(
   [
     AUTHENTICATE,
     check("userId", "User uid is invalid").not().isEmpty(),
-    check("email", "Email address is not valid").isEmail(),
     check("vehicleType", "Vehicle type is not valid").isIn(["car", "bike"]),
     check("photo", "Photo is not valid").optional(),
     check("buildYear", "BuildYear address is not valid").optional(),
@@ -127,6 +126,30 @@ router.post(
         onlyValidData: true,
       });
       vehicle_controller.vehicleRegistration(params, req.files, res);
+    }
+  }
+);
+
+router.put(
+  `/updateVehicle`,
+  [
+    AUTHENTICATE,
+    check("vehicleId", "Vehicle id is reqyured").notEmpty(),
+    check("vehicleType", "Vehicle type is not valid").isIn(["car", "bike"]),
+    check("buildYear", "BuildYear address is not valid").optional(),
+    check("make", "make is not valid").not().isEmpty(),
+    check("model", "model is not valid").not().isEmpty(),
+    check("nickName", "NickName  is not valid").optional(),
+    check("engineSize", "engineSize  is not valid").optional(),
+    check("photo", "Photo is not valid").optional(),
+    check("imageType", "imageType  is not valid").optional(),
+  ],
+  (req, res, next) => {
+    if (HAS_ERROR(req, res) == false) {
+      const params = matchedData(req, {
+        onlyValidData: true,
+      });
+      vehicle_controller.updateVechile(params, req.files, req.userId, res);
     }
   }
 );
