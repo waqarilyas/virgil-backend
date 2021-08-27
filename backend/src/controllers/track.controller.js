@@ -190,7 +190,7 @@ const runRoute = async (params, res) => {
   }
 };
 
-const rateRoute = async (params, res) => {
+const rateRoute = async (params, files, res) => {
   try {
     const { userId, route, comment, rating } = params;
 
@@ -201,6 +201,13 @@ const rateRoute = async (params, res) => {
       rating,
     });
     const rt = await Route.findById(route).populate("reviews");
+
+    if (files.length > 0) {
+      EVENT.emit("upload-and-save-review-images", {
+        files,
+        review: review._id,
+      });
+    }
 
     const tRating = rt.reviews.reduce((a, b) => +a + +b.rating, 0);
 

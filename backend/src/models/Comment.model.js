@@ -22,6 +22,11 @@ const commentSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
+    images: {
+      type: Array,
+      default: [],
+      required: false,
+    },
   },
   {
     timestamps: true,

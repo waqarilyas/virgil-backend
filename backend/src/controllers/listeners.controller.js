@@ -1,8 +1,9 @@
-const { User, Vehicle, Stop } = require("../models");
+const { User, Vehicle, Stop, Comment } = require("../models");
 const Route = require("../models/Route.model");
 const { updateUserById } = require("../services/user.service");
 const { saveNewActivityLog } = require("../services/activityLog.service");
 const { saveNotification } = require("../services/notification.service");
+const AUX = require("../helpers/auxilaries");
 
 const axios = require("axios");
 const { FIREBASE_SERVER_KEY } = require("../config/default");
@@ -102,6 +103,23 @@ const saveRouteStops = async (params) => {
   }
 };
 
+const uploadReviewImages = async (params) => {
+  const { files, review } = params;
+  files.forEach(async (item, index) => {
+    const photo = await AUX.uploadToAws(
+      item.buffer,
+      `routes/reviews/${review}/${index}`
+    );
+
+    await Comment.findOneAndUpdate(
+      { _id: review },
+      {
+        $push: { images: photo.Location },
+      }
+    );
+  });
+};
+
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
@@ -111,4 +129,5 @@ module.exports = {
   sendAndStoreNotification,
   updateRequestInUser,
   saveRouteStops,
+  uploadReviewImages,
 };

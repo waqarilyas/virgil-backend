@@ -126,7 +126,8 @@ router.post(
       onlyValidData: true,
     });
 
-    if (HAS_ERROR(req, res) == false) track_controller.rateRoute(params, res);
+    if (HAS_ERROR(req, res) == false)
+      track_controller.rateRoute(params, req.files, res);
   }
 );
 
