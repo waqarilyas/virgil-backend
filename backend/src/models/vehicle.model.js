@@ -31,11 +31,11 @@ const vehicleSchema = mongoose.Schema(
     },
     nickName: {
       type: String,
-      required: true,
+      required: false,
     },
     engineSize: {
       type: String,
-      required: true,
+      required: false,
     },
     totalTrips: {
       type: Number,
