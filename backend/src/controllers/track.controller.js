@@ -297,7 +297,7 @@ const getMapData = async (params, res) => {
     const { userId } = params;
 
     const data = await Route.find({ _id: { $ne: userId } })
-      .select(["coordinates", "rideName", "createdAt"])
+      .select(["coordinates", "rideName", "createdAt", "routeSnap"])
       .populate("stops")
       .populate("owner", ["firstName", "lastName"])
       .where("isPublic")
