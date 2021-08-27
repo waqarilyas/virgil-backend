@@ -40,18 +40,11 @@ const getUserVehicles = async (params, res) => {
 
 const vehicleRegistration = async (params, files, res) => {
   try {
-    const ph = params.photo;
-    const type = params.imageType;
-
-    delete params["photo"];
-    delete params["imageType"];
-
     let vehicle = await saveVehicle(params);
-    if (files[0]) {
+    if (files.length > 0) {
       const photo = await AUX.uploadToAws(
         files[0].buffer,
         `vehicles/cover/${vehicle._id}`,
-        type
       );
       const updatedVehicle = await Vehicle.findByIdAndUpdate(
         vehicle._id,
@@ -84,8 +77,48 @@ const vehicleRegistration = async (params, files, res) => {
   }
 };
 
+const updateVechile = async (params, files, userId, res) => {
+  try {
+    let dataToUpdate = {
+      ...params
+    }
+    if (files.length > 0) {
+      const photo = await AUX.uploadToAws(
+        files[0].buffer,
+        `vehicles/cover/${params.vehicleId}`,
+      );
+      dataToUpdate['photo'] = photo.Location;
+    }
+    const vehicle = await Vehicle.findByIdAndUpdate(
+      params.vehicleId,
+      dataToUpdate,
+      { new: true }
+    );
+
+    EVENT.emit("update-activity-log", {
+      userId: userId,
+      message: `You updated vehicle ${vehicle.make}`,
+      extraInfo: {
+        activityType: "UPDATE_VEHICLE",
+        documentName: "vehicleId",
+        relatedDocumentId: vehicle._id,
+      },
+    });
+
+    res.status(httpStatus.OK).send({
+      status: true,
+      message: "Vehicle updated successfully",
+      vehicle: vehicle,
+    });
+  } catch (err) {
+    console.log(err);
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   getVehicle,
   getUserVehicles,
   vehicleRegistration,
+  updateVechile
 };

@@ -13,11 +13,11 @@ module.exports = function (app) {
     app.use(express.json());
     app.use(fileParser({
         rawBodyOptions: {
-            limit: '15mb', //file size limit
+            limit: '30mb', //file size limit
         },
         busboyOptions: {
             limits: {
-                fields: 30 //Number text fields allowed 
+                fields: 50 //Number text fields allowed 
             }
         }
     }));
