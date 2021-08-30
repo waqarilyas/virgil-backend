@@ -10,7 +10,7 @@ const requestRoute = require("./requests.routes");
 
 const router = express.Router();
 
-exports.foo = function () {};
+exports.foo = function () { };
 
 const defaultRoutes = [
   {
@@ -51,7 +51,7 @@ defaultRoutes.forEach((route) => {
 });
 
 /* istanbul ignore next */
-if (config.ENV === "staging") {
+if (config.ENV === "STAGING") {
   devRoutes.forEach((route) => {
     router.use(route.path, route.route);
   });
