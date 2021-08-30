@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ENVIRONMENTS } = require("../helpers/enums");
 require("../triggers/triggers");
 require("../config/aws.config");
 const DEFAULTS = require("./default");
@@ -8,7 +9,7 @@ let url = DEFAULTS.DATABASE_PATH;
 (async () => {
   await mongoose
     .connect(url, {
-      dbName: DEFAULTS.DB_NAME,
+      dbName: DEFAULTS.ENV == ENVIRONMENTS.staging ? DEFAULTS.DB_NAME : DEFAULTS.PROD_DB_NAME,
       useCreateIndex: true,
       useNewUrlParser: true,
       useUnifiedTopology: true,

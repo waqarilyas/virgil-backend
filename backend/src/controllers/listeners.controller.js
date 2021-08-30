@@ -77,7 +77,7 @@ const sendAndStoreNotification = async (params) => {
 };
 
 const updateRequestInUser = async (params) => {
-  await User.findOneAndUpdate(params.userId, {
+  await User.findOneAndUpdate(params.requestFrom, {
     $push: { requests: params.requestId },
   });
 };

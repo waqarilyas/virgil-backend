@@ -5,6 +5,12 @@ const FRIEND_STATUS = {
   currentUser: "CURRENT_USER",
 };
 
+const ENVIRONMENTS = {
+  staging: 'STAGING',
+  production: 'PRODUCTION'
+}
+
 module.exports = {
   FRIEND_STATUS,
+  ENVIRONMENTS
 };

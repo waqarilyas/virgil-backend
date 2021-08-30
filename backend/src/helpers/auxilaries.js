@@ -4,13 +4,9 @@ const { isValidObjectId } = require("mongoose");
 const CONFIG = require("../config/default");
 const MAILER = require("../config/mailer.config");
 
-exports.uploadToAws = function (photo, filename, type) {
+exports.uploadToAws = function (photo, filename) {
   return new Promise((resolve, reject) => {
     try {
-      // let buffer = Buffer.from(
-      //   photo.replace(/^data:image\/\w+;base64,/, ""),
-      //   "base64"
-      // );
 
       const s3 = new AWS.S3();
       const base64Data = photo;

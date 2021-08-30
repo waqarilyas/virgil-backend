@@ -33,6 +33,7 @@ const getAllUsers = async (params, res) => {
     const currentUser = await User.findOne({ _id: userId }).populate(
       "requests"
     );
+    console.log(currentUser.requests);
     const users = await getPaginatedUsers(userId, page, perPage);
     users.forEach(async (item, index) => {
       if (
@@ -48,7 +49,12 @@ const getAllUsers = async (params, res) => {
       ) {
         item.status = FRIEND_STATUS.requested;
       } else {
-        item.status = FRIEND_STATUS.anon;
+        let requestedByme = item.requests.filter((req) => req.requestFrom.equals(currentUser._id));
+        if (requestedByme.length > 0) {
+          item.status = FRIEND_STATUS.requested;
+        } else {
+          item.status = FRIEND_STATUS.anon;
+        }
       }
     });
 
