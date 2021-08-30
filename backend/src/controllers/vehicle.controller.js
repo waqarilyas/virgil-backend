@@ -44,7 +44,7 @@ const vehicleRegistration = async (params, files, res) => {
     if (files.length > 0) {
       const photo = await AUX.uploadToAws(
         files[0].buffer,
-        `vehicles/cover/${vehicle._id}`,
+        `vehicles/cover/${vehicle._id}`
       );
       const updatedVehicle = await Vehicle.findByIdAndUpdate(
         vehicle._id,
@@ -80,14 +80,14 @@ const vehicleRegistration = async (params, files, res) => {
 const updateVechile = async (params, files, userId, res) => {
   try {
     let dataToUpdate = {
-      ...params
-    }
+      ...params,
+    };
     if (files.length > 0) {
       const photo = await AUX.uploadToAws(
         files[0].buffer,
-        `vehicles/cover/${params.vehicleId}`,
+        `vehicles/cover/${params.vehicleId}`
       );
-      dataToUpdate['photo'] = photo.Location;
+      dataToUpdate["photo"] = photo.Location;
     }
     const vehicle = await Vehicle.findByIdAndUpdate(
       params.vehicleId,
@@ -120,5 +120,5 @@ module.exports = {
   getVehicle,
   getUserVehicles,
   vehicleRegistration,
-  updateVechile
+  updateVechile,
 };
