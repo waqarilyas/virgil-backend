@@ -16,6 +16,7 @@ const swaggerDef = {
       url: `http://localhost:${config.PORT}/api/v1`,
     },
   ],
+  security: [{ bearerAuth: [] }],
 };
 
 module.exports = swaggerDef;

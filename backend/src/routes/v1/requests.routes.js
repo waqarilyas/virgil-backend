@@ -8,8 +8,8 @@ const request_controller = require("../../controllers/request.controller");
 /**
  * @swagger
  * tags:
- *   name: User
- *   description: User related api documentation
+ *   name: Request
+ *   description: Request related api documentation
  */
 /**
  * @swagger
@@ -40,6 +40,37 @@ router.get(
   }
 );
 
+/**
+ * @swagger
+ * /request/sendFriendRequest?requestFrom={requestFrom}&requestTo={requestTo}&:
+ *   get:
+ *     summary: Send Friend Request
+ *     tags: [Request]
+ *     parameters:
+ *      - in: path
+ *        name: requestFrom
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Request Sending user ID
+ *      - in: path
+ *        name: requestTo
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: Request Receiving user ID
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               name: message
+ *               type: string
+ *               example:
+ *                   message: "Friend Request Sent Successfully"
+ */
+
 router.get(
   `/sendFriendRequest`,
   [
@@ -57,6 +88,41 @@ router.get(
   }
 );
 
+/**
+ * @swagger
+ * /request/handleFriendRequest:
+ *   post:
+ *     summary: Accept/Reject Friend Request
+ *     tags: [Request]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - requestId
+ *               - operation
+ *             properties:
+ *               requestId:
+ *                 type: string
+ *               operation:
+ *                 type: string
+ *             example:
+ *               requestId: 61261db25ec64b2fe8f6941b
+ *               operation: ACCEPT
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               name: message
+ *               type: string
+ *               example:
+ *                   message: "Friend Request Handled Successfully"
+ */
+
 router.post(
   `/handleFriendRequest`,
   [
@@ -73,6 +139,24 @@ router.post(
     }
   }
 );
+
+/**
+ * @swagger
+ * /request/getFriendRequests:
+ *   get:
+ *     summary: Get all friend requests
+ *     tags: [Request]
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 UserFriendRequests:
+ *                   $ref: '#/components/schemas/FriendRequests'
+ */
 
 router.get(`/getFriendRequests`, [AUTHENTICATE], (req, res, next) => {
   if (HAS_ERROR(req, res) == false) {
