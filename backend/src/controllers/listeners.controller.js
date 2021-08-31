@@ -83,23 +83,45 @@ const updateRequestInUser = async (params) => {
 };
 
 const saveRouteStops = async (params) => {
-  const { routeId, stops } = params;
+  try {
+    const { routeId, stops, files } = params;
 
-  if (stops.length > 0) {
-    stops.forEach(async (st) => {
-      const { coords, name, type } = st;
-      const stopParams = {
-        routeId,
-        coords,
-        name,
-        type,
-      };
-      const stp = await Stop.create(stopParams);
-      await Route.findOneAndUpdate(
-        { _id: routeId },
-        { $push: { stops: stp._id } }
-      );
-    });
+    let fs = files.filter((file) => file.fieldname != "routeSnap");
+
+    if (stops.length > 0) {
+      stops.forEach(async (st, ind) => {
+        const { coords, name, type, id } = st;
+        const stopParams = {
+          routeId,
+          coords,
+          name,
+          type,
+        };
+        const stp = await Stop.create(stopParams);
+
+        fs.forEach(async (file, index) => {
+          if (file.fieldname == id) {
+            const photo = await AUX.uploadToAws(
+              file.buffer,
+              `routes/${routeId}/stops/${stp._id}/${index}`
+            );
+
+            await Stop.findOneAndUpdate(
+              { _id: stp._id },
+              { $push: { images: photo.Location } }
+            );
+          }
+        });
+
+        await Route.findOneAndUpdate(
+          { _id: routeId },
+          { $push: { stops: stp._id } }
+        );
+      });
+    }
+    console.log("---stops saved successfully----");
+  } catch (err) {
+    console.log("---error saving stops----", err);
   }
 };
 
