@@ -50,6 +50,7 @@ const saveTrack = async (params, files, res) => {
     EVENT.emit("save-route-stops", {
       routeId: rt._id,
       stops: parsedStops,
+      files,
     });
 
     if (files.length > 0) {

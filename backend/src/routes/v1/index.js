@@ -51,7 +51,7 @@ defaultRoutes.forEach((route) => {
 });
 
 /* istanbul ignore next */
-if (config.ENV === "staging") {
+if (config.ENV === "STAGING") {
   devRoutes.forEach((route) => {
     router.use(route.path, route.route);
   });
