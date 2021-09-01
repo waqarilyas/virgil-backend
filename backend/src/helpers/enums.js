@@ -6,11 +6,23 @@ const FRIEND_STATUS = {
 };
 
 const ENVIRONMENTS = {
-  staging: 'STAGING',
-  production: 'PRODUCTION'
-}
+  staging: "STAGING",
+  production: "PRODUCTION",
+};
+
+const ROUTE_FILTERS = {
+  NEAR_ME: "nearMe",
+  MOST_RIDDEN: "mostRidden",
+  LEAST_RIDDEN: "leastRidden",
+  SHORTEST_PATH: "shortestPath",
+  LONGEST_PATH: "longestPath",
+  TOP_RATED: "topRated",
+  LEAST_RATED: "leastRidden",
+  MOST_STOPS: "mostStops",
+};
 
 module.exports = {
   FRIEND_STATUS,
-  ENVIRONMENTS
+  ENVIRONMENTS,
+  ROUTE_FILTERS,
 };

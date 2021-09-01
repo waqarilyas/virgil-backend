@@ -7,7 +7,6 @@ const MAILER = require("../config/mailer.config");
 exports.uploadToAws = function (photo, filename) {
   return new Promise((resolve, reject) => {
     try {
-
       const s3 = new AWS.S3();
       const base64Data = photo;
 
