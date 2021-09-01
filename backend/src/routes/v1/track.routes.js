@@ -36,6 +36,7 @@ router.post(
     check("vehicleId", "vehicleId is not valid").not().isEmpty(),
     check("imageType", "imageType  is not valid").optional(),
     check("stops", "stops  is not valid").optional(),
+    check("address", "address  is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {
@@ -137,6 +138,9 @@ router.get(
     AUTHENTICATE,
     check("page", "page is not valid").not().isEmpty(),
     check("perPage", "perPage is not valid").not().isEmpty(),
+    check("filter", "perPage is not valid").optional(),
+    check("lat", "lat is not valid").not().isEmpty(),
+    check("lang", "lang is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {

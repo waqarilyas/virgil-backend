@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const geoSchema = require("./geoSchema.model");
 const { toJSON } = require("./plugins");
 
 const routeSchema = mongoose.Schema(
@@ -17,6 +18,15 @@ const routeSchema = mongoose.Schema(
       type: Array,
       default: [],
       required: true,
+    },
+    routeLocation: {
+      type: geoSchema,
+      index: "2dsphere",
+    },
+    address: {
+      type: String,
+      required: true,
+      trim: true,
     },
     routeSnap: {
       type: String,

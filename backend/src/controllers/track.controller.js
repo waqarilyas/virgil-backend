@@ -14,6 +14,7 @@ const {
 const EVENT = require("../triggers/custom-events").customEvent;
 const Route = require("../models/Route.model");
 const Comment = require("../models/Comment.model");
+const { ROUTE_FILTERS } = require("../helpers/enums");
 
 const test = (params, res) => {
   res.status(200).send({
@@ -32,21 +33,29 @@ const saveTrack = async (params, files, res) => {
       routeLength,
       vehicleId,
       stops,
+      address,
     } = params;
 
     const desc = JSON.parse(descriptors);
     const coords = JSON.parse(coordinates);
     const parsedStops = JSON.parse(stops);
+    const geoData = coords[0];
 
-    const veh = {
+    const routeLocation = {
+      coordinates: [geoData.latitude, geoData.longitude],
+    };
+
+    const routeData = {
       rideName,
       descriptors: desc,
       isPublic,
       coordinates: coords,
       owner,
       routeLength,
+      routeLocation,
+      address,
     };
-    let rt = await saveRoute(veh);
+    let rt = await saveRoute(routeData);
     EVENT.emit("save-route-stops", {
       routeId: rt._id,
       stops: parsedStops,
@@ -237,12 +246,53 @@ const rateRoute = async (params, files, res) => {
 
 const getUserListing = async (params, res) => {
   try {
-    const { perPage, page } = params;
+    const { perPage, page, filter, lat, lang } = params;
+    let filterValue, sortObj;
 
-    const routes = await Route.find({})
+    switch (filter) {
+      case ROUTE_FILTERS.MOST_RIDDEN:
+        sortObj = { timesTaken: -1 };
+        break;
+      case ROUTE_FILTERS.LEAST_RIDDEN:
+        sortObj = { timesTaken: 1 };
+        break;
+      case ROUTE_FILTERS.SHORTEST_PATH:
+        sortObj = { routeLength: -1 };
+        break;
+      case ROUTE_FILTERS.LONGEST_PATH:
+        sortObj = { routeLength: 1 };
+        break;
+      case ROUTE_FILTERS.TOP_RATED:
+        sortObj = { totalRating: -1 };
+        break;
+      case ROUTE_FILTERS.LEAST_RATED:
+        sortObj = { totalRating: 1 };
+        break;
+      case ROUTE_FILTERS.MOST_STOPS:
+        sortObj = { "stops.length": -1 };
+        break;
+      case ROUTE_FILTERS.NEAR_ME:
+        sortObj = { timesTaken: 1 };
+        filterValue = {
+          routeLocation: {
+            $near: {
+              $maxDistance: 300000,
+              $geometry: {
+                type: "Point",
+                coordinates: [lat, lang],
+              },
+            },
+          },
+        };
+        break;
+      default:
+        sortObj = { "stops.length": -1 };
+    }
+
+    const routes = await Route.find(filterValue)
       .where("isPublic")
       .equals(true)
-      .sort({ timesTaken: 1 })
+      .sort(sortObj)
       .limit(parseInt(perPage))
       .skip(page * perPage)
       .lean()
