@@ -138,7 +138,7 @@ router.get(
     AUTHENTICATE,
     check("page", "page is not valid").not().isEmpty(),
     check("perPage", "perPage is not valid").not().isEmpty(),
-    check("filter", "perPage is not valid").optional(),
+    check("filter", "filter is not valid").optional(),
     check("lat", "lat is not valid").not().isEmpty(),
     check("lang", "lang is not valid").not().isEmpty(),
   ],
