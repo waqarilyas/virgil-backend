@@ -4,7 +4,11 @@ const AUX = require("../helpers/auxilaries");
 const { Vehicle, User, Requests } = require("../models");
 var mongoose = require("mongoose");
 
-const { getUserById, getPaginatedUsers } = require("../services/user.service");
+const {
+  getUserById,
+  getPaginatedUsers,
+  getPopulatedUser,
+} = require("../services/user.service");
 const { FRIEND_STATUS } = require("../helpers/enums");
 
 const test = (params, res) => {
@@ -16,7 +20,10 @@ const test = (params, res) => {
 
 const getUser = async (params, res) => {
   try {
-    const user = await getUserById(params.id);
+    const user = await getPopulatedUser(
+      params.id,
+      "vehicles routes favouriteRoutes friends"
+    );
 
     res.status(200).send({
       status: true,
@@ -49,7 +56,9 @@ const getAllUsers = async (params, res) => {
       ) {
         item.status = FRIEND_STATUS.requested;
       } else {
-        let requestedByme = item.requests.filter((req) => req.requestFrom.equals(currentUser._id));
+        let requestedByme = item.requests.filter((req) =>
+          req.requestFrom.equals(currentUser._id)
+        );
         if (requestedByme.length > 0) {
           item.status = FRIEND_STATUS.requested;
         } else {
@@ -89,9 +98,39 @@ const getUserFriends = async (params, res) => {
   }
 };
 
+const updateUser = async (params, userId, files, res) => {
+  try {
+    let dataToUpdate = {
+      ...params,
+    };
+    if (files?.length > 0) {
+      await AUX.deleteFromAWS(`users/${userId}/profile`);
+
+      const photo = await AUX.uploadToAws(
+        files[0].buffer,
+        `users/${userId}/profile`
+      );
+      dataToUpdate.profileImage = photo.Location;
+    }
+    const user = await User.findByIdAndUpdate(userId, dataToUpdate, {
+      new: true,
+    });
+
+    res.status(httpStatus.OK).send({
+      status: true,
+      message: "user updated successfully",
+      user: user,
+    });
+  } catch (err) {
+    console.log(err);
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   getUser,
   getAllUsers,
   getUserFriends,
+  updateUser,
 };

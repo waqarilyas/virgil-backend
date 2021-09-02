@@ -89,4 +89,25 @@ router.get(
   }
 );
 
+router.put(
+  `/updateUser`,
+  [
+    AUTHENTICATE,
+    check("firstName", "First Name is not provided").optional(),
+    check("lastName", "First Name is not provided").optional(),
+    check("country", "Country name is not provided").optional(),
+    check("zipCode", "Zip code is not provided").optional(),
+    check("city", "City/State is not provided").optional(),
+  ],
+  (req, res, next) => {
+    if (HAS_ERROR(req, res) == false) {
+      const params = matchedData(req, {
+        onlyValidData: true,
+      });
+
+      user_controller.updateUser(params, req.userId, req.files, res);
+    }
+  }
+);
+
 module.exports = router;

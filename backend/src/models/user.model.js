@@ -18,6 +18,11 @@ const userSchema = mongoose.Schema(
       required: false,
       trim: true,
     },
+    profileImage: {
+      type: String,
+      required: false,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,

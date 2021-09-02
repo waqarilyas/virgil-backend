@@ -111,10 +111,13 @@ const getPaginatedUsers = async (userId, page, perPage) => {
   return await User.find({ _id: { $ne: userId } })
     .limit(parseInt(perPage))
     .skip(page * perPage)
-    .populate('requests')
+    .populate("requests")
     .lean();
 };
 
+const getPopulatedUser = async (id, fields) => {
+  return User.findById(id).populate(fields);
+};
 module.exports = {
   createUser,
   queryUsers,
@@ -126,4 +129,5 @@ module.exports = {
   addToUserFriends,
   removeUserFriend,
   getPaginatedUsers,
+  getPopulatedUser,
 };
