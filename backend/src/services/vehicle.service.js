@@ -8,8 +8,12 @@ const saveVehicle = async (params) => {
 const getVehicleById = async (vehicleId) => {
   return await Vehicle.findOne({ _id: vehicleId }).lean();
 };
+const deleteVehicleById = async (vehicleId) => {
+  return await Vehicle.findOneAndDelete({ _id: vehicleId });
+};
 
 module.exports = {
   getVehicleById,
   saveVehicle,
+  deleteVehicleById,
 };

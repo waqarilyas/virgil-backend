@@ -142,6 +142,15 @@ const uploadReviewImages = async (params) => {
   });
 };
 
+const deleteVehicleInUser = async (vehicleId, userId) => {
+  await User.findOneAndUpdate(
+    { _id: userId },
+    {
+      $pull: { vehicles: vehicleId },
+    }
+  );
+};
+
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
@@ -152,4 +161,5 @@ module.exports = {
   updateRequestInUser,
   saveRouteStops,
   uploadReviewImages,
+  deleteVehicleInUser,
 };

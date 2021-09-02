@@ -3,6 +3,8 @@ const EVENT = require("./custom-events").customEvent;
 const LISTENERS = require("../controllers/listeners.controller");
 
 EVENT.addListener("update-vehicle-in-user", LISTENERS.updateUserVehicle);
+EVENT.addListener("delete-vehicle-in-user", LISTENERS.deleteVehicleInUser);
+
 EVENT.addListener("update-route-in-user", LISTENERS.updateUserRoute);
 EVENT.addListener("delete-route-in-user", LISTENERS.deleteRouteFromUser);
 EVENT.addListener(
