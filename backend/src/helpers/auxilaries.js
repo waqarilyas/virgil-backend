@@ -46,7 +46,6 @@ exports.deleteFromAWS = function (key) {
         }
       });
     } catch (error) {
-      console.log(error);
       reject(error);
     }
   });

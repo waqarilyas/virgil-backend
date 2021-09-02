@@ -87,7 +87,7 @@ const updateVechile = async (params, files, userId, res) => {
     let dataToUpdate = {
       ...params,
     };
-    if (files.length > 0) {
+    if (files?.length > 0) {
       await AUX.deleteFromAWS(`vehicles/cover/${params.vehicleId}`);
 
       const photo = await AUX.uploadToAws(
