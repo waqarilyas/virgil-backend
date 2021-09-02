@@ -326,6 +326,25 @@ const addToFavourite = async (params, res) => {
   }
 };
 
+const removeRouteFromFavourites = async (params, res) => {
+  try {
+    const { userId, routeId } = params;
+
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { favouriteRoutes: routeId } },
+      { new: true }
+    ).populate("favouriteRoutes");
+
+    res.status(200).send({
+      status: true,
+      user,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 const getUserFavouriteRoutes = async (params, res) => {
   try {
     const { userId, page, perPage } = params;
@@ -377,4 +396,5 @@ module.exports = {
   addToFavourite,
   getUserFavouriteRoutes,
   getMapData,
+  removeRouteFromFavourites,
 };

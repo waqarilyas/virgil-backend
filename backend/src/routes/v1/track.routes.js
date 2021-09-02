@@ -163,6 +163,18 @@ router.post(
       track_controller.addToFavourite(params, res);
   }
 );
+router.post(
+  `/removeFavouriteRoute`,
+  [AUTHENTICATE, check("routeId", "routeId is not valid").not().isEmpty()],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    params.userId = req.userId;
+    if (HAS_ERROR(req, res) == false)
+      track_controller.removeRouteFromFavourites(params, res);
+  }
+);
 
 router.get(
   `/getFavouriteRoutes`,
@@ -189,4 +201,5 @@ router.get(`/getMapData`, [AUTHENTICATE], (req, res, next) => {
 
   if (HAS_ERROR(req, res) == false) track_controller.getMapData(params, res);
 });
+
 module.exports = router;

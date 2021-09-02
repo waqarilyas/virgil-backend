@@ -154,4 +154,16 @@ router.put(
   }
 );
 
+router.delete(
+  `/deleteVehicle`,
+  [AUTHENTICATE, check("vehicleId", "vehicleId is not valid").not().isEmpty()],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    if (HAS_ERROR(req, res) == false) params.userId = req.userId;
+    vehicle_controller.deleteVehicle(params, res);
+  }
+);
+
 module.exports = router;

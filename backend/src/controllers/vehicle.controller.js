@@ -1,5 +1,9 @@
 const { Vehicle } = require("../models");
-const { getVehicleById, saveVehicle } = require("../services/vehicle.service");
+const {
+  getVehicleById,
+  saveVehicle,
+  deleteVehicleById,
+} = require("../services/vehicle.service");
 const EVENT = require("../triggers/custom-events").customEvent;
 const AUX = require("../helpers/auxilaries");
 const httpStatus = require("http-status");
@@ -83,6 +87,8 @@ const updateVechile = async (params, files, userId, res) => {
       ...params,
     };
     if (files.length > 0) {
+      await AUX.deleteFromAWS(`vehicles/cover/${params.vehicleId}`);
+
       const photo = await AUX.uploadToAws(
         files[0].buffer,
         `vehicles/cover/${params.vehicleId}`
@@ -116,9 +122,37 @@ const updateVechile = async (params, files, userId, res) => {
   }
 };
 
+const deleteVehicle = async (params, res) => {
+  try {
+    const { vehicleId, userId } = params;
+
+    await AUX.deleteFromAWS(`vehicles/cover/${vehicleId}`);
+    await deleteVehicleById(vehicleId);
+
+    EVENT.emit("update-activity-log", {
+      userId: params.userId,
+      message: "You deleted a vehicle",
+      extraInfo: {
+        activityType: "DELETE_VEHICLE",
+        documentName: "vehicleId",
+        relatedDocumentId: vehicleId,
+      },
+    });
+    EVENT.emit("delete-vehicle-in-user", vehicleId, userId);
+    res.status(httpStatus.OK).send({
+      status: true,
+      message: "Vehicle deleted successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   getVehicle,
   getUserVehicles,
   vehicleRegistration,
   updateVechile,
+  deleteVehicle,
 };

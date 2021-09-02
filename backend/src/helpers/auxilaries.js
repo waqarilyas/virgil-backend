@@ -30,28 +30,27 @@ exports.uploadToAws = function (photo, filename) {
   });
 };
 
-// exports.deleteFromAWS = function (key) {
-//     return new Promise((resolve, reject) => {
-//         try {
-//             const s3 = new AWS.S3();
-//             var params = {
-//                 Bucket: CONFIG.aws.bucket,
-//                 Key: `${CONFIG.DB_NAME}/${key}`
-//             }
-//             s3.deleteObject(params, (err, data) => {
-//                 if (err) {
-//                     console.log(err);
-//                     reject();
-//                 } else {
-//                     resolve(data);
-//                 }
-//             })
-//         } catch (error) {
-//             console.log(error);
-//             reject()
-//         }
-//     })
-// }
+exports.deleteFromAWS = function (key) {
+  return new Promise((resolve, reject) => {
+    try {
+      const s3 = new AWS.S3();
+      var params = {
+        Bucket: CONFIG.AWS.bucket,
+        Key: `${CONFIG.DB_NAME}/${key}`,
+      };
+      s3.deleteObject(params, (err, data) => {
+        if (err) {
+          reject();
+        } else {
+          resolve(data);
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
 
 exports.sendEmail = function (to, subject, message) {
   return new Promise((resolve, reject) => {
