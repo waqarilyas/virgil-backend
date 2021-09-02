@@ -206,16 +206,17 @@ const rateRoute = async (params, files, res) => {
     });
     const rt = await Route.findById(route).populate("reviews");
 
-    if (files.length > 0) {
+    if (files?.length > 0) {
       EVENT.emit("upload-and-save-review-images", {
         files,
         review: review._id,
       });
     }
 
-    const tRating = rt.reviews.reduce((a, b) => +a + +b.rating, 0);
+    const tRating = rt.reviews.reduce((a, b) => +a + +parseInt(b.rating), 0);
 
-    const averageRating = (tRating + rating) / (rt.reviews.length + 1);
+    const averageRating =
+      (tRating + parseInt(rating)) / (rt?.reviews?.length + 1);
 
     const updatedRoute = await Route.findOneAndUpdate(
       { _id: route },
@@ -276,7 +277,7 @@ const getUserListing = async (params, res) => {
         filterValue = {
           routeLocation: {
             $near: {
-              $maxDistance: 300000,
+              $maxDistance: 30000,
               $geometry: {
                 type: "Point",
                 coordinates: [lat, lang],
@@ -286,7 +287,7 @@ const getUserListing = async (params, res) => {
         };
         break;
       default:
-        sortObj = { "stops.length": -1 };
+        sortObj = { timesTaken: -1 };
     }
 
     const routes = await Route.find(filterValue)

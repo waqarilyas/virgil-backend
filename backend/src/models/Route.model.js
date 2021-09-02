@@ -34,9 +34,9 @@ const routeSchema = mongoose.Schema(
       default: 0,
     },
     routeLength: {
-      type: String,
+      type: Number,
       required: true,
-      trim: true,
+      default: 0,
     },
     totalDistanceCovered: {
       type: Number,
@@ -46,6 +46,7 @@ const routeSchema = mongoose.Schema(
     timesTaken: {
       type: Number,
       required: false,
+      default: 0,
     },
     owner: {
       type: mongoose.SchemaTypes.ObjectId,
