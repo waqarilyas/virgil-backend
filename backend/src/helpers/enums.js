@@ -19,6 +19,7 @@ const ROUTE_FILTERS = {
   TOP_RATED: "topRated",
   LEAST_RATED: "leastRidden",
   MOST_STOPS: "mostStops",
+  LEAST_STOPS: "leastStops",
 };
 
 module.exports = {
