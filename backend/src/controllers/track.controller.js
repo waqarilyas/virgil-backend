@@ -98,7 +98,14 @@ const saveTrack = async (params, files, res) => {
 const getSingleRoute = async (params, res) => {
   try {
     // await AUX.checkIfValidId(params.routeId, res);
-    const route = await Route.findById(params.routeId).lean().populate("stops");
+    const route = await Route.findById(params.routeId)
+      .lean()
+      .populate({
+        path: "stops reviews",
+        populate: {
+          path: "userId route",
+        },
+      });
     if (route) {
       return res.status(httpStatus.OK).send({
         status: true,
