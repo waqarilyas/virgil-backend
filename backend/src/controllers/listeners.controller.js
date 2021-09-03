@@ -115,7 +115,7 @@ const saveRouteStops = async (params) => {
 
         await Route.findOneAndUpdate(
           { _id: routeId },
-          { $push: { stops: stp._id } }
+          { $push: { stops: stp._id }, $inc: { numStops: 1 } }
         );
       });
     }

@@ -80,6 +80,11 @@ const routeSchema = mongoose.Schema(
         ref: "Stop",
       },
     ],
+    numStops: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   {
     timestamps: true,

@@ -270,7 +270,10 @@ const getUserListing = async (params, res) => {
         sortObj = { totalRating: 1 };
         break;
       case ROUTE_FILTERS.MOST_STOPS:
-        sortObj = { "stops.length": -1 };
+        sortObj = { numStops: -1 };
+        break;
+      case ROUTE_FILTERS.LEAST_STOPS:
+        sortObj = { numStops: 1 };
         break;
       case ROUTE_FILTERS.NEAR_ME:
         sortObj = { timesTaken: 1 };
