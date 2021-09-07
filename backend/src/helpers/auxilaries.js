@@ -36,16 +36,19 @@ exports.deleteFromAWS = function (key) {
       const s3 = new AWS.S3();
       var params = {
         Bucket: CONFIG.AWS.bucket,
-        Key: `${CONFIG.DB_NAME}/${key}`,
+        Key: `${CONFIG.DB_NAME}/${key}/`,
       };
       s3.deleteObject(params, (err, data) => {
         if (err) {
+          console.log("---eror deleting data from aws err----", err);
           reject();
         } else {
+          console.log("---data deleted successfully from aws----");
           resolve(data);
         }
       });
     } catch (error) {
+      console.log("---eror deleting data from aws----", error);
       reject(error);
     }
   });
@@ -83,4 +86,30 @@ exports.apiResposne = (response, statusCode, status, msg) => {
     status: status,
     message: msg,
   });
+};
+
+exports.emptyS3Directory = async (dir) => {
+  const bucket = CONFIG.AWS.bucket;
+  const s3 = new AWS.S3();
+  const listParams = {
+    Bucket: bucket,
+    Prefix: dir,
+  };
+
+  const listedObjects = await s3.listObjectsV2(listParams).promise();
+
+  if (listedObjects.Contents.length === 0) return;
+
+  const deleteParams = {
+    Bucket: bucket,
+    Delete: { Objects: [] },
+  };
+
+  listedObjects.Contents.forEach(({ Key }) => {
+    deleteParams.Delete.Objects.push({ Key });
+  });
+
+  await s3.deleteObjects(deleteParams).promise();
+
+  if (listedObjects.IsTruncated) await emptyS3Directory(dir);
 };

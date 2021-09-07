@@ -65,7 +65,10 @@ const saveTrack = async (params, files, res) => {
     });
 
     if (files.length > 0) {
-      const photo = await AUX.uploadToAws(files[0].buffer, `routes/${rt._id}`);
+      const photo = await AUX.uploadToAws(
+        files[0].buffer,
+        `routes/${rt._id}/routeSnap`
+      );
       const updatedRoute = await Route.findByIdAndUpdate(
         rt._id,
         {
@@ -148,7 +151,8 @@ const getUserRoutes = async (params, res) => {
 
 const deleteRoute = async (params, res) => {
   try {
-    // await AUX.checkIfValidId(params.routeId, res);
+    // await AUX.deleteFromAWS(`routes/${params.routeId}`);
+    await AUX.emptyS3Directory(`routes/${params.routeId}/`);
     const route = await deleteRouteById(params.routeId);
     EVENT.emit("delete-route-in-user", params.routeId, params.userId);
 
