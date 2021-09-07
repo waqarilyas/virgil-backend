@@ -85,6 +85,11 @@ const routeSchema = mongoose.Schema(
       required: false,
       default: 0,
     },
+    totalTimeTaken: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   {
     timestamps: true,

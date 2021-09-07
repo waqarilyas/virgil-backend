@@ -1,8 +1,9 @@
 const { saveVehicle } = require("../services/vehicle.service");
 const httpStatus = require("http-status");
 const AUX = require("../helpers/auxilaries");
-const { Vehicle, Comment, ActivityLog } = require("../models");
+const { Vehicle, Comment, ActivityLog, User } = require("../models");
 const { FIREBASE_SERVER_KEY } = require("../config/default");
+const EVENT = require("../triggers/custom-events").customEvent;
 const axios = require("axios");
 
 const test = function (req, files, res) {
@@ -89,9 +90,39 @@ const notificationTest = async (params, res) => {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
   }
 };
+
+const inviteToRide = async (params, res) => {
+  try {
+    const { receivers, routeId, message } = params;
+    // const user = await User.findOne({ _id: userId });
+    let rec = JSON.parse(receivers);
+
+    rec.forEach((item) => {
+      EVENT.emit("send-notification", {
+        userId: item._id,
+        token: item.deviceId,
+        message: message,
+        extraInfo: {
+          activityType: "RIDE_REQUEST",
+          documentName: "routeId",
+          relatedDocumentId: routeId,
+        },
+      });
+    });
+
+    res.status(200).send({
+      status: true,
+      activityLog: "Users invited for ride successfully",
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   getUserReviews,
   getUserActivityLog,
   notificationTest,
+  inviteToRide,
 };

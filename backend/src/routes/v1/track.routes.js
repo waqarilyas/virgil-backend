@@ -102,6 +102,7 @@ router.post(
     check("imageType", "imageType  is not valid").optional(),
     check("stops", "stops  is not valid").optional(),
     check("address", "address  is not valid").not().isEmpty(),
+    check("totalTimeTaken", "totalTimeTaken  is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {
