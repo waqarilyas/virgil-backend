@@ -34,6 +34,7 @@ const saveTrack = async (params, files, res) => {
       vehicleId,
       stops,
       address,
+      totalTimeTaken,
     } = params;
 
     const desc = JSON.parse(descriptors);
@@ -54,6 +55,7 @@ const saveTrack = async (params, files, res) => {
       routeLength,
       routeLocation,
       address,
+      totalTimeTaken,
     };
     let rt = await saveRoute(routeData);
     EVENT.emit("save-route-stops", {
