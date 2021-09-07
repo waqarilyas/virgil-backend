@@ -65,7 +65,6 @@ const sendAndStoreNotification = async (params) => {
     data,
   };
   await axios(config);
-  console.log("--notification sent successfully--");
 
   const notifyParams = {
     userId,

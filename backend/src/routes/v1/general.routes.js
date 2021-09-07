@@ -58,4 +58,19 @@ router.post(
   }
 );
 
+router.post(
+  `/inviteToRide`,
+  [
+    check("receivers", "receivers are not valid").not().isEmpty(),
+    check("routeId", "routeId is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    if (HAS_ERROR(req, res) == false) params.userId = req.userId;
+    general_controller.inviteToRide(params, res);
+  }
+);
+
 module.exports = router;

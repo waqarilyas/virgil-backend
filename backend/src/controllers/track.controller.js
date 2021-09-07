@@ -103,7 +103,7 @@ const getSingleRoute = async (params, res) => {
       .populate({
         path: "stops reviews",
         populate: {
-          path: "userId route",
+          path: "userId",
         },
       });
     if (route) {
@@ -265,10 +265,10 @@ const getUserListing = async (params, res) => {
         sortObj = { timesTaken: 1 };
         break;
       case ROUTE_FILTERS.SHORTEST_PATH:
-        sortObj = { routeLength: -1 };
+        sortObj = { routeLength: 1 };
         break;
       case ROUTE_FILTERS.LONGEST_PATH:
-        sortObj = { routeLength: 1 };
+        sortObj = { routeLength: -1 };
         break;
       case ROUTE_FILTERS.TOP_RATED:
         sortObj = { totalRating: -1 };
