@@ -261,59 +261,87 @@ const rateRoute = async (params, files, res) => {
 const getUserListing = async (params, res) => {
   try {
     const { perPage, page, filter, lat, lang } = params;
-    let filterValue, sortObj;
+    let near = {
+      $geometry: {
+        type: "Point",
+        coordinates: [parseFloat(lat), parseFloat(lang)],
+      },
+    };
+    let filterValue = {
+        $geoNear: {
+          near: near,
+          distanceField: "distance",
+          spherical: true,
+        },
+      },
+      sortObj;
 
     switch (filter) {
       case ROUTE_FILTERS.MOST_RIDDEN:
-        sortObj = { timesTaken: -1 };
+        sortObj = { $sort: { timesTaken: -1 } };
         break;
       case ROUTE_FILTERS.LEAST_RIDDEN:
-        sortObj = { timesTaken: 1 };
+        sortObj = { $sort: { timesTaken: 1 } };
         break;
       case ROUTE_FILTERS.SHORTEST_PATH:
-        sortObj = { routeLength: 1 };
+        sortObj = { $sort: { routeLength: 1 } };
         break;
       case ROUTE_FILTERS.LONGEST_PATH:
-        sortObj = { routeLength: -1 };
+        sortObj = { $sort: { routeLength: -1 } };
         break;
       case ROUTE_FILTERS.TOP_RATED:
-        sortObj = { totalRating: -1 };
+        sortObj = { $sort: { totalRating: 1 } };
         break;
       case ROUTE_FILTERS.LEAST_RATED:
-        sortObj = { totalRating: 1 };
+        sortObj = { $sort: { totalRating: -1 } };
         break;
       case ROUTE_FILTERS.MOST_STOPS:
-        sortObj = { numStops: -1 };
+        sortObj = { $sort: { numStops: -1 } };
         break;
       case ROUTE_FILTERS.LEAST_STOPS:
-        sortObj = { numStops: 1 };
+        sortObj = { $sort: { numStops: 1 } };
         break;
       case ROUTE_FILTERS.NEAR_ME:
-        sortObj = { timesTaken: 1 };
-        filterValue = {
-          routeLocation: {
-            $near: {
-              $maxDistance: 30000,
-              $geometry: {
-                type: "Point",
-                coordinates: [lat, lang],
-              },
-            },
+        sortObj = { $sort: { timesTaken: -1 } };
+        near = {
+          $maxDistance: 30000,
+          $geometry: {
+            type: "Point",
+            coordinates: [parseFloat(lat), parseFloat(lang)],
           },
         };
+        filterValue = {
+          $geoNear: {
+            near: near,
+            distanceField: "distance",
+            spherical: true,
+          },
+        };
+
         break;
       default:
-        sortObj = { timesTaken: -1 };
+        sortObj = { $sort: { timesTaken: -1 } };
     }
+    let query = [];
+    query.push(filterValue);
+    query.push(sortObj);
+    query.push({ $limit: parseInt(perPage) });
+    query.push({ $skip: page * perPage });
+    query.push({ $match: { isPublic: true } });
+    query.push({
+      $lookup: {
+        from: "stops",
+        localField: "_id",
+        foreignField: "routeId",
+        as: "stops",
+      },
+    });
 
-    const routes = await Route.find(filterValue)
-      .where("isPublic")
-      .equals(true)
-      .sort(sortObj)
-      .limit(parseInt(perPage))
-      .skip(page * perPage)
-      .lean()
-      .populate("stops");
+    const routes = await Route.aggregate(query);
+
+    // routes.populate({
+    //   name: "stops",
+    // });
 
     res.status(200).send({
       status: true,
