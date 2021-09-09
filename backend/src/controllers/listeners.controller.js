@@ -12,7 +12,6 @@ const updateUserVehicle = async (vehicleId, userid) => {
   await User.findByIdAndUpdate(userid, {
     $push: { vehicles: vehicleId },
   });
-  console.log("--user vehicle updated successfully--");
 };
 
 const updateUserRoute = async (routeId, userId) => {

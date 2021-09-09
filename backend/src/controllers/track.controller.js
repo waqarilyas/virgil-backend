@@ -302,7 +302,7 @@ const getUserListing = async (params, res) => {
         sortObj = { $sort: { numStops: 1 } };
         break;
       case ROUTE_FILTERS.NEAR_ME:
-        sortObj = { $sort: { timesTaken: -1 } };
+        sortObj = { $sort: { distance: 1 } };
         near = {
           $maxDistance: 30000,
           $geometry: {
@@ -338,10 +338,6 @@ const getUserListing = async (params, res) => {
     });
 
     const routes = await Route.aggregate(query);
-
-    // routes.populate({
-    //   name: "stops",
-    // });
 
     res.status(200).send({
       status: true,
