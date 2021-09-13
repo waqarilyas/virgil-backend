@@ -156,6 +156,22 @@ const getFriendRequests = async (params, res) => {
   }
 };
 
+const removeFriend = async (params, res) => {
+  try {
+    const { friendId } = params;
+
+    const requests = await getRequestsByRequestTo(userId);
+
+    return res.status(200).send({
+      message: "successfull",
+      status: true,
+      requests,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   sendFriendRequest,
