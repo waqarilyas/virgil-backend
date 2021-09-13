@@ -10,7 +10,7 @@ const requestRoute = require("./requests.routes");
 
 const router = express.Router();
 
-exports.foo = function () {};
+exports.foo = function () { };
 
 const defaultRoutes = [
   {
