@@ -317,7 +317,7 @@ router.post(
  */
 
 router.post(
-  `/changePassword`,
+  `/resetPassword`,
   [
     check("email", "Email address is not valid").isEmail(),
     check("password", "Invalid Code").not().isEmpty(),
@@ -327,6 +327,23 @@ router.post(
       onlyValidData: true,
     });
 
+    if (HAS_ERROR(req, res) == false)
+      auth_controller.resetPassword(params, res);
+  }
+);
+
+router.post(
+  `/changePassword`,
+  [
+    AUTHENTICATE,
+    check("oldPassword", "Invalid Password").not().isEmpty(),
+    check("password", "Invalid Password").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    params.userId = req.userId;
     if (HAS_ERROR(req, res) == false)
       auth_controller.changePassword(params, res);
   }

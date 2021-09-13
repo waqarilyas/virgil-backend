@@ -15,7 +15,10 @@ const {
   generateAuthTokens,
   removeToken,
 } = require("../services/token.service");
-const { loginUserWithEmailAndPassword } = require("../services/auth.service");
+const {
+  loginUserWithEmailAndPassword,
+  authchangePassword,
+} = require("../services/auth.service");
 const { AUTHENTICATE } = require("../middlewares/auth.middleware");
 
 //Simple version, without validation or sanitation
@@ -89,7 +92,7 @@ const verifyCode = async (req, res) => {
   });
 };
 
-const changePassword = async (req, res) => {
+const resetPassword = async (req, res) => {
   try {
     const emailExist = await getUserByEmail(req.email);
 
@@ -169,13 +172,28 @@ const logout = async (params, res) => {
   }
 };
 
+const changePassword = async (params, res) => {
+  try {
+    const { password, oldPassword, userId } = params;
+    const user = await authchangePassword(userId, oldPassword, password);
+    res.status(httpStatus.OK).send({
+      status: true,
+      message: "Password changed successfully",
+      user,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test: test,
   register,
   login,
   forgotPassword,
   verifyCode,
-  changePassword,
+  resetPassword,
   socialLogin,
   logout,
+  changePassword,
 };
