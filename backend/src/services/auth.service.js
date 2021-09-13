@@ -83,9 +83,18 @@ const verifyEmail = async (verifyEmailToken) => {
   }
 };
 
+const authchangePassword = async (userId, oldPassword, password) => {
+  const user = await User.findOne({ _id: userId });
+  if (!user || !(await user.isPasswordMatch(oldPassword))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
+  }
+  return await userService.updateUserById(userId, { password: password });
+};
+
 module.exports = {
   loginUserWithEmailAndPassword,
   refreshAuth,
   resetPassword,
   verifyEmail,
+  authchangePassword,
 };
