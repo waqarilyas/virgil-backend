@@ -168,4 +168,22 @@ router.get(`/getFriendRequests`, [AUTHENTICATE], (req, res, next) => {
   }
 });
 
+router.post(
+  `/removeFriend`,
+  [
+    AUTHENTICATE,
+    check("friendId", "friendId is invalid").not().isEmpty(),
+    check("userId", "userId is invalid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    if (HAS_ERROR(req, res) == false) {
+      const params = matchedData(req, {
+        onlyValidData: true,
+      });
+
+      request_controller.removeFriend(params, res);
+    }
+  }
+);
+
 module.exports = router;
