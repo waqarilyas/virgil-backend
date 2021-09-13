@@ -40,38 +40,42 @@ const updateActivityLog = async (params) => {
 };
 
 const sendAndStoreNotification = async (params) => {
-  const { token, extraData, message, userId, extraInfo } = params;
+  try {
+    const { token, extraData, message, userId, extraInfo } = params;
 
-  let data = JSON.stringify({
-    to: token,
-    data: extraData,
-    notification: {
-      title: "Virgil",
-      body: message,
-      mutable_content: true,
-      sound: "Tri-tone",
-      priority: "high",
-    },
-  });
+    let data = JSON.stringify({
+      to: token,
+      data: extraData,
+      notification: {
+        title: "Virgil",
+        body: message,
+        mutable_content: true,
+        sound: "Tri-tone",
+        priority: "high",
+      },
+    });
 
-  const config = {
-    method: "post",
-    url: "https://fcm.googleapis.com/fcm/send",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: FIREBASE_SERVER_KEY,
-    },
-    data,
-  };
-  await axios(config);
+    const config = {
+      method: "post",
+      url: "https://fcm.googleapis.com/fcm/send",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `key=${FIREBASE_SERVER_KEY}`,
+      },
+      data,
+    };
+    await axios(config);
 
-  const notifyParams = {
-    userId,
-    message: message,
-    extraInfo,
-  };
+    const notifyParams = {
+      userId,
+      message: message,
+      extraInfo,
+    };
 
-  await saveNotification(notifyParams);
+    await saveNotification(notifyParams);
+  } catch (err) {
+    console.log("---error handling notification---", err);
+  }
 };
 
 const updateRequestInUser = async (params) => {

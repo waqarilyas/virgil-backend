@@ -40,7 +40,7 @@ router.get(
   }
 );
 
-router.get(
+router.post(
   `/sendFriendRequest`,
   [
     AUTHENTICATE,
