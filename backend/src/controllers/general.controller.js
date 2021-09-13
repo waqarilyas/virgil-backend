@@ -75,7 +75,7 @@ const notificationTest = async (params, res) => {
       url: "https://fcm.googleapis.com/fcm/send",
       headers: {
         "Content-Type": "application/json",
-        Authorization: FIREBASE_SERVER_KEY,
+        Authorization: `key=${FIREBASE_SERVER_KEY}`,
       },
       data,
     };

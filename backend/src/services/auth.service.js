@@ -86,7 +86,7 @@ const verifyEmail = async (verifyEmailToken) => {
 const authchangePassword = async (userId, oldPassword, password) => {
   const user = await User.findOne({ _id: userId });
   if (!user || !(await user.isPasswordMatch(oldPassword))) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect password");
   }
   return await userService.updateUserById(userId, { password: password });
 };

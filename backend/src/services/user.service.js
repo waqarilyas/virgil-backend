@@ -118,6 +118,9 @@ const getPaginatedUsers = async (userId, page, perPage) => {
 const getPopulatedUser = async (id, fields) => {
   return User.findById(id).populate(fields);
 };
+
+// const removeUserFriend = async (userId, friendId) => {};
+
 module.exports = {
   createUser,
   queryUsers,
