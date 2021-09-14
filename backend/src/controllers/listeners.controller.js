@@ -41,7 +41,8 @@ const updateActivityLog = async (params) => {
 
 const sendAndStoreNotification = async (params) => {
   try {
-    const { token, extraData, message, userId, extraInfo } = params;
+    const { token, extraData, message, userId, extraInfo, request, route } =
+      params;
 
     let data = JSON.stringify({
       to: token,
@@ -66,11 +67,17 @@ const sendAndStoreNotification = async (params) => {
     };
     await axios(config);
 
-    const notifyParams = {
+    let notifyParams = {
       userId,
       message: message,
       extraInfo,
     };
+    if (route) {
+      notifyParams.route = route;
+    }
+    if (request) {
+      notifyParams.request = request;
+    }
 
     await saveNotification(notifyParams);
   } catch (err) {

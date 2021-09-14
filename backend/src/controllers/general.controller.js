@@ -1,10 +1,13 @@
 const { saveVehicle } = require("../services/vehicle.service");
+const { getNotificationsByUser } = require("../services/notification.service");
+
 const httpStatus = require("http-status");
 const AUX = require("../helpers/auxilaries");
 const { Vehicle, Comment, ActivityLog, User } = require("../models");
 const { FIREBASE_SERVER_KEY } = require("../config/default");
 const EVENT = require("../triggers/custom-events").customEvent;
 const axios = require("axios");
+const { NOTIFICATION_TYPES } = require("../helpers/enums");
 
 const test = function (req, files, res) {
   res.status(200).send({
@@ -102,11 +105,9 @@ const inviteToRide = async (params, res) => {
         userId: item._id,
         token: item.deviceId,
         message: message,
-        extraInfo: {
-          activityType: "RIDE_REQUEST",
-          documentName: "routeId",
-          relatedDocumentId: routeId,
-        },
+        route: routeId,
+        request: null,
+        extraInfo: {},
       });
     });
 
@@ -119,10 +120,27 @@ const inviteToRide = async (params, res) => {
   }
 };
 
+const getUserNotifications = async (params, res) => {
+  try {
+    const { userId } = params;
+
+    const notifications = await getNotificationsByUser(userId, "route request");
+
+    res.status(200).send({
+      status: true,
+      message: "Successfull",
+      data: notifications,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   getUserReviews,
   getUserActivityLog,
   notificationTest,
   inviteToRide,
+  getUserNotifications,
 };

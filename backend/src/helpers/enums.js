@@ -22,8 +22,14 @@ const ROUTE_FILTERS = {
   LEAST_STOPS: "leastStops",
 };
 
+const NOTIFICATION_TYPES = {
+  FRIEND_REQUEST: "friendRequest",
+  RIDE_REQUEST: "rideRequest",
+};
+
 module.exports = {
   FRIEND_STATUS,
   ENVIRONMENTS,
   ROUTE_FILTERS,
+  NOTIFICATION_TYPES,
 };

@@ -60,10 +60,11 @@ const sendFriendRequest = async (params, res) => {
       message: `${
         sender.firstName + " " + sender.lastName
       } sent you a friend request`,
+      request: req._id,
+      route: null,
       extraInfo: {
         activityType: "SEND_REQUEST",
-        documentName: "senderId",
-        relatedDocumentId: requestFrom,
+        senderId: requestFrom,
       },
     });
 

@@ -137,6 +137,7 @@ router.post(
   [
     check("receivers", "receivers are not valid").not().isEmpty(),
     check("routeId", "routeId is not valid").not().isEmpty(),
+    check("message", "message is not valid").not().isEmpty(),
   ],
   (req, res, next) => {
     const params = matchedData(req, {
@@ -144,6 +145,17 @@ router.post(
     });
     if (HAS_ERROR(req, res) == false) params.userId = req.userId;
     general_controller.inviteToRide(params, res);
+  }
+);
+
+router.get(
+  `/getUserNotifications`,
+  [AUTHENTICATE, check("userId", "userId is not valid").not().isEmpty()],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+    general_controller.getUserNotifications(params, res);
   }
 );
 
