@@ -119,6 +119,14 @@ const getPopulatedUser = async (id, fields) => {
   return User.findById(id).populate(fields);
 };
 
+const updateUserDeviceId = async (userId, deviceId) => {
+  return await User.findOneAndUpdate(
+    { _id: userId },
+    { deviceId: deviceId },
+    { new: true }
+  );
+};
+
 // const removeUserFriend = async (userId, friendId) => {};
 
 module.exports = {
@@ -133,4 +141,5 @@ module.exports = {
   removeUserFriend,
   getPaginatedUsers,
   getPopulatedUser,
+  updateUserDeviceId,
 };

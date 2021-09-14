@@ -40,38 +40,7 @@ router.get(
   }
 );
 
-/**
- * @swagger
- * /request/sendFriendRequest?requestFrom={requestFrom}&requestTo={requestTo}&:
- *   get:
- *     summary: Send Friend Request
- *     tags: [Request]
- *     parameters:
- *      - in: path
- *        name: requestFrom
- *        schema:
- *          type: string
- *        required: true
- *        description: Request Sending user ID
- *      - in: path
- *        name: requestTo
- *        schema:
- *          type: string
- *        required: true
- *        description: Request Receiving user ID
- *     responses:
- *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               name: message
- *               type: string
- *               example:
- *                   message: "Friend Request Sent Successfully"
- */
-
-router.get(
+router.post(
   `/sendFriendRequest`,
   [
     AUTHENTICATE,

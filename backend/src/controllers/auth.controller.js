@@ -10,6 +10,7 @@ const {
   createUser,
   getUserByEmail,
   changeUserPassword,
+  updateUserDeviceId,
 } = require("../services/user.service");
 const {
   generateAuthTokens,
@@ -44,11 +45,12 @@ const register = async (params, res) => {
 
 const login = async (params, res) => {
   try {
-    const { email, password } = params;
+    const { email, password, deviceId } = params;
     const user = await loginUserWithEmailAndPassword(email, password);
     await removeToken(user);
     const tokens = await generateAuthTokens(user);
-    res.send({ user, tokens });
+    const dbUser = await updateUserDeviceId(user._id, deviceId);
+    res.send({ user: dbUser, tokens });
   } catch (err) {
     res.status(httpStatus.BAD_REQUEST).send({
       status: false,
