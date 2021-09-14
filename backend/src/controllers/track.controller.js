@@ -106,7 +106,7 @@ const getSingleRoute = async (params, res) => {
     const route = await Route.findById(params.routeId)
       .lean()
       .populate({
-        path: "stops reviews",
+        path: "stops reviews owner",
         populate: {
           path: "userId",
         },
