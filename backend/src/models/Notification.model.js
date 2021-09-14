@@ -18,6 +18,14 @@ const notificationSchema = mongoose.Schema(
       documentName: String,
       relatedDocumentId: String,
     },
+    request: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Requests",
+    },
+    route: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "Route",
+    },
   },
   {
     timestamps: true,
