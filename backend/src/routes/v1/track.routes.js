@@ -525,4 +525,20 @@ router.get(`/getMapData`, [AUTHENTICATE], (req, res, next) => {
   if (HAS_ERROR(req, res) == false) track_controller.getMapData(params, res);
 });
 
+router.get(
+  `/onStartRun`,
+  [
+    AUTHENTICATE,
+    check("userId", "userId is not valid").not().isEmpty(),
+    check("routeId", "routeId is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+
+    if (HAS_ERROR(req, res) == false) track_controller.onStartRun(params, res);
+  }
+);
+
 module.exports = router;

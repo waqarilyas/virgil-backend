@@ -7,6 +7,7 @@ const AUX = require("../helpers/auxilaries");
 
 const axios = require("axios");
 const { FIREBASE_SERVER_KEY } = require("../config/default");
+const { RIDER_REQUEST_TYPE } = require("../helpers/enums");
 
 const updateUserVehicle = async (vehicleId, userid) => {
   await User.findByIdAndUpdate(userid, {
@@ -160,6 +161,26 @@ const deleteVehicleInUser = async (vehicleId, userId) => {
   );
 };
 
+const updateRouteRider = async (routeId, userId, type) => {
+  switch (type) {
+    case RIDER_REQUEST_TYPE.ADD:
+      await Route.findOneAndUpdate(
+        { _id: routeId },
+        { $push: { currentRiders: userId }, $inc: { numCurrentRiders: 1 } }
+      );
+      console.log("---user successfully added to current riders---");
+      break;
+
+    case RIDER_REQUEST_TYPE.REMOVE:
+      await Route.findOneAndUpdate(
+        { _id: routeId },
+        { $pull: { currentRiders: userId }, $inc: { numCurrentRiders: -1 } }
+      );
+      console.log("---user successfully removed from current riders---");
+      break;
+  }
+};
+
 module.exports = {
   updateUserVehicle,
   updateUserRoute,
@@ -171,4 +192,5 @@ module.exports = {
   saveRouteStops,
   uploadReviewImages,
   deleteVehicleInUser,
+  updateRouteRider,
 };

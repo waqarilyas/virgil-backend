@@ -20,6 +20,7 @@ const ROUTE_FILTERS = {
   LEAST_RATED: "leastRidden",
   MOST_STOPS: "mostStops",
   LEAST_STOPS: "leastStops",
+  HOT_ROUTE: "hotRoute",
 };
 
 const NOTIFICATION_TYPES = {
@@ -27,9 +28,15 @@ const NOTIFICATION_TYPES = {
   RIDE_REQUEST: "rideRequest",
 };
 
+const RIDER_REQUEST_TYPE = {
+  REMOVE: "remove",
+  ADD: "add",
+};
+
 module.exports = {
   FRIEND_STATUS,
   ENVIRONMENTS,
   ROUTE_FILTERS,
   NOTIFICATION_TYPES,
+  RIDER_REQUEST_TYPE,
 };

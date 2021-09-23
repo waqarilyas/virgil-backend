@@ -20,3 +20,5 @@ EVENT.addListener(
   "upload-and-save-review-images",
   LISTENERS.uploadReviewImages
 );
+
+EVENT.addListener("update-route-rider", LISTENERS.uploadReviewImages);

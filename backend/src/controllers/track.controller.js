@@ -6,7 +6,6 @@ const AUX = require("../helpers/auxilaries");
 const { User } = require("../models");
 const {
   saveRoute,
-  findRouteById,
   getPaginatedRoutesByUserId,
   getRouteCountByOwnerId,
   deleteRouteById,
@@ -14,7 +13,7 @@ const {
 const EVENT = require("../triggers/custom-events").customEvent;
 const Route = require("../models/Route.model");
 const Comment = require("../models/Comment.model");
-const { ROUTE_FILTERS } = require("../helpers/enums");
+const { ROUTE_FILTERS, RIDER_REQUEST_TYPE } = require("../helpers/enums");
 
 const test = (params, res) => {
   res.status(200).send({
@@ -196,6 +195,12 @@ const runRoute = async (params, res) => {
         relatedDocumentId: routeId,
       },
     });
+    EVENT.emit(
+      "update-route-rider",
+      routeId,
+      userId,
+      RIDER_REQUEST_TYPE.REMOVE
+    );
 
     return res.status(httpStatus.OK).send({
       status: true,
@@ -205,6 +210,16 @@ const runRoute = async (params, res) => {
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
   }
+};
+const onStartRun = async (params, res) => {
+  const { routeId, userId } = params;
+
+  EVENT.emit("update-route-rider", routeId, userId, RIDER_REQUEST_TYPE.ADD);
+
+  return res.status(httpStatus.OK).send({
+    status: true,
+    message: "route ran successfully",
+  });
 };
 
 const rateRoute = async (params, files, res) => {
@@ -267,6 +282,7 @@ const getUserListing = async (params, res) => {
         coordinates: [parseFloat(lat), parseFloat(lang)],
       },
     };
+
     let filterValue = {
         $geoNear: {
           near: near,
@@ -301,6 +317,26 @@ const getUserListing = async (params, res) => {
       case ROUTE_FILTERS.LEAST_STOPS:
         sortObj = { $sort: { numStops: 1 } };
         break;
+
+      case ROUTE_FILTERS.HOT_ROUTE:
+        sortObj = { $sort: { numCurrentRiders: -1 } };
+        near = {
+          $maxDistance: 30000,
+          $geometry: {
+            type: "Point",
+            coordinates: [parseFloat(lat), parseFloat(lang)],
+          },
+        };
+        filterValue = {
+          $geoNear: {
+            near: near,
+            distanceField: "distance",
+            spherical: true,
+          },
+        };
+
+        break;
+
       case ROUTE_FILTERS.NEAR_ME:
         sortObj = { $sort: { distance: 1 } };
         near = {
@@ -438,4 +474,5 @@ module.exports = {
   getUserFavouriteRoutes,
   getMapData,
   removeRouteFromFavourites,
+  onStartRun,
 };
