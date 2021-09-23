@@ -90,6 +90,18 @@ const routeSchema = mongoose.Schema(
       required: false,
       default: 0,
     },
+    currentRiders: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "User",
+        required: true,
+      },
+    ],
+    numCurrentRiders: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   {
     timestamps: true,
