@@ -42,7 +42,7 @@ const saveTrack = async (params, files, res) => {
     const geoData = coords[0];
 
     const routeLocation = {
-      coordinates: [geoData.latitude, geoData.longitude],
+      coordinates: [geoData.longitude, geoData.latitude],
     };
 
     const routeData = {
@@ -276,20 +276,21 @@ const rateRoute = async (params, files, res) => {
 const getUserListing = async (params, res) => {
   try {
     const { perPage, page, filter, lat, lang } = params;
+    let geoJCoords = [parseFloat(lang), parseFloat(lat)]
     let near = {
       $geometry: {
         type: "Point",
-        coordinates: [parseFloat(lat), parseFloat(lang)],
+        coordinates: geoJCoords,
       },
     };
 
     let filterValue = {
-        $geoNear: {
-          near: near,
-          distanceField: "distance",
-          spherical: true,
-        },
+      $geoNear: {
+        near: near,
+        distanceField: "distance",
+        spherical: true,
       },
+    },
       sortObj;
 
     switch (filter) {
@@ -324,7 +325,7 @@ const getUserListing = async (params, res) => {
           $maxDistance: 30000,
           $geometry: {
             type: "Point",
-            coordinates: [parseFloat(lat), parseFloat(lang)],
+            coordinates: geoJCoords,
           },
         };
         filterValue = {
@@ -343,9 +344,10 @@ const getUserListing = async (params, res) => {
           $maxDistance: 30000,
           $geometry: {
             type: "Point",
-            coordinates: [parseFloat(lat), parseFloat(lang)],
+            coordinates: geoJCoords,
           },
         };
+        console.log(near);
         filterValue = {
           $geoNear: {
             near: near,
@@ -359,6 +361,7 @@ const getUserListing = async (params, res) => {
         sortObj = { $sort: { timesTaken: -1 } };
     }
     let query = [];
+    console.log(filterValue);
     query.push(filterValue);
     query.push(sortObj);
     query.push({ $limit: parseInt(perPage) });

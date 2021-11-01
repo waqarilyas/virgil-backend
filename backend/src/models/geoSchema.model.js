@@ -11,7 +11,6 @@ const geoSchema = new Schema({
 });
 
 // geoSchema.plugin(toJSON);
-
 // const Geo = mongoose.model("Geo", geoSchema);
 
 module.exports = geoSchema;
