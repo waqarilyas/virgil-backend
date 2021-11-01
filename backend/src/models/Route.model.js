@@ -110,7 +110,6 @@ const routeSchema = mongoose.Schema(
 
 // add plugin that converts mongoose to json
 routeSchema.plugin(toJSON);
-
 /**
  * @typedef Token
  */
