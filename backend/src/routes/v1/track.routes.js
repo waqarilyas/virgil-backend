@@ -152,7 +152,7 @@ router.post(
 
 router.get(
   `/getSingleRoute`,
-  [AUTHENTICATE, check("routeId", "routeId is not valid").not().isEmpty()],
+  [check("routeId", "routeId is not valid").not().isEmpty()],
   (req, res, next) => {
     const params = matchedData(req, {
       onlyValidData: true,
