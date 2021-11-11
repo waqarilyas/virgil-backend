@@ -9,6 +9,7 @@ const {
   getPaginatedRoutesByUserId,
   getRouteCountByOwnerId,
   deleteRouteById,
+  updateRoute,
 } = require("../services/route.service");
 const EVENT = require("../triggers/custom-events").customEvent;
 const Route = require("../models/Route.model");
@@ -83,6 +84,47 @@ const saveTrack = async (params, files, res) => {
     EVENT.emit("update-activity-log", {
       userId: owner,
       message: "You saved a new route",
+      extraInfo: {
+        activityType: "SAVE_NEW_ROUTE",
+        documentName: "routeId",
+        relatedDocumentId: rt._id,
+      },
+    });
+
+    res.status(200).send({
+      message: "Route saved successfully",
+      route: rt,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const updateTrack = async (params, res) => {
+  try {
+    const {
+      routeId,
+      coordinates,
+      routeLength,
+      vehicleId
+    } = params;
+    const coords = JSON.parse(coordinates);
+    const geoData = coords[0];
+
+    const routeLocation = {
+      coordinates: [geoData.longitude, geoData.latitude],
+    };
+
+    const routeData = {
+      coordinates: coords,
+      routeLength,
+      routeLocation,
+    };
+    let rt = await updateRoute(routeId, routeData);
+    EVENT.emit("update-route-distance-in-vehicle", vehicleId, routeLength);
+    EVENT.emit("update-activity-log", {
+      userId: rt.owner,
+      message: `You updated route ${rt.rideName}`,
       extraInfo: {
         activityType: "SAVE_NEW_ROUTE",
         documentName: "routeId",
@@ -478,4 +520,5 @@ module.exports = {
   getMapData,
   removeRouteFromFavourites,
   onStartRun,
+  updateTrack
 };

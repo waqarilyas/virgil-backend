@@ -7,6 +7,10 @@ const saveRoute = async (params) => {
   return await Route.create(params);
 };
 
+const updateRoute = async (routeId, params) => {
+  return await Route.findOneAndUpdate({ _id: routeId }, params);
+};
+
 const findRouteById = async (routeId) => {
   return await Route.findById(routeId).lean();
 };
@@ -28,6 +32,7 @@ const deleteRouteById = async (routeId) => {
 
 module.exports = {
   saveRoute,
+  updateRoute,
   findRouteById,
   getPaginatedRoutesByUserId,
   getRouteCountByOwnerId,

@@ -1,0 +1,187 @@
+
+
+.main {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 1819px;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  padding: 100px 35px;
+}
+
+.sec1 {
+  width: 30%;
+  height: 50vh;
+  margin: 0.5rem;
+  font-size: 2rem;
+  display: flex;
+  justify-content: center;
+  border-top: 1px white solid; 
+  padding-top: 1.25rem;
+}
+
+.main-logo{
+
+text-align: center;
+padding-top: 30px;
+
+}
+.sec2 a img{
+
+width:5%;
+
+position: fixed; 
+bottom: 25px; right: 50px;
+
+}
+.sec1 a img{
+
+  
+
+  width:5%;
+
+  position: fixed; 
+  bottom: 30px; right: 150px;
+  
+  }
+  
+  @media only screen and (max-width: 767px) {
+    
+    .sec2 a img{
+      width:10%;
+      
+       
+      position: fixed; 
+      bottom: 25px; left: 200px;
+     
+      
+      }
+      .sec1 a img{
+        width:10%;
+      
+        position: fixed; 
+        bottom: 30px; right: 200px;
+        
+        
+        }
+    } 
+
+
+
+.app-download{
+
+
+
+   /* background-color:#CB6015;  */
+  background-position: center top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  position: relative;
+  z-index: 1;
+}
+
+
+.app-download .section-title h2{
+
+color:white;
+
+}
+.app-download-item {
+  text-align: center;
+  background-color: #212121;
+  padding:30px;
+  border-radius: 10px;
+  
+}
+
+.app-download::before{
+
+content: "";
+position: absolute;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+z-index: -1;
+ /* background-color: #CB6015;  */
+opacity: 0.8;
+  
+}
+/* ICON COLOR */
+.app-download-item i{
+  font-size: 30px;
+  display:inline-block;
+  color:white;
+}
+/* ICON BELOW TEXT COLOR */
+.app-download-item h3{
+
+  font-size:22px;
+  color:white;
+  margin: 20px 0;
+  font-weight:500;
+  text-transform: capitalize;
+}
+/* ICON BELOW PARAGRAPH COLOR */
+.app-download-item p{
+
+font-size:16px;
+color: white;
+font-weight:300;
+margin: 0 0 30px;
+line-height: 26px;
+margin-bottom: 10px;
+}
+
+
+
+
+/* BUTTON STYLING */
+
+
+.btn-2{
+
+
+background-color:white;
+padding:12px 30px;
+border: none;
+border-radius:30px;
+color: black;
+font-size: 16px;
+text-transform: capitalize;
+
+transform: all 0.5s ease;
+
+font-weight: 500;
+}
+
+
+.btn-2:hover{
+
+  color: #212121;
+  background-color:#00FF90;
+}
+
+
+@media only screen and (max-width: 767px) {
+  .app-download-item {
+    margin-bottom: 10px;
+  }}
+
+  .app-download .section-title h2 {
+    color: #212121;
+    text-align: center;
+    font-size:30px;
+    font-weight:300px;
+}
+
+.a1{
+
+margin-top: 50px;
+
+}
+
+.app-download-item:hover{
+  transform:scale(1.05,1.05);
+}
