@@ -114,6 +114,25 @@ router.post(
   }
 );
 
+router.post(
+  `/updateRoute`,
+  [
+    AUTHENTICATE,
+    check("coordinates", "coordinates is not valid").not().isEmpty(),
+    check("routeLength", "routeLength is not valid").not().isEmpty(),
+    check("vehicleId", "vehicleId is not valid").not().isEmpty(),
+    check("routeId", "RouteId is not valid").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
+
+    if (HAS_ERROR(req, res) == false)
+      track_controller.updateTrack(params, res);
+  }
+);
+
 /**
  * @swagger
  * /track/getSingleRoute?routeId={routeId}:
