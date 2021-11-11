@@ -120,7 +120,6 @@ router.post(
     AUTHENTICATE,
     check("coordinates", "coordinates is not valid").not().isEmpty(),
     check("routeLength", "routeLength is not valid").not().isEmpty(),
-    check("vehicleId", "vehicleId is not valid").not().isEmpty(),
     check("routeId", "RouteId is not valid").not().isEmpty(),
   ],
   (req, res, next) => {

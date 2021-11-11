@@ -106,7 +106,6 @@ const updateTrack = async (params, res) => {
       routeId,
       coordinates,
       routeLength,
-      vehicleId
     } = params;
     const coords = JSON.parse(coordinates);
     const geoData = coords[0];
@@ -121,7 +120,6 @@ const updateTrack = async (params, res) => {
       routeLocation,
     };
     let rt = await updateRoute(routeId, routeData);
-    EVENT.emit("update-route-distance-in-vehicle", vehicleId, routeLength);
     EVENT.emit("update-activity-log", {
       userId: rt.owner,
       message: `You updated route ${rt.rideName}`,
