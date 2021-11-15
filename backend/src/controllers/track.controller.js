@@ -100,7 +100,7 @@ const saveTrack = async (params, files, res) => {
   }
 };
 
-const updateTrack = async (params, res) => {
+const updateTrack = async (params, files, res) => {
   try {
     const {
       routeId,
@@ -120,6 +120,22 @@ const updateTrack = async (params, res) => {
       routeLocation,
     };
     let rt = await updateRoute(routeId, routeData);
+
+    if (files.length > 0) {
+      const photo = await AUX.uploadToAws(
+        files[0].buffer,
+        `routes/${rt._id}/routeSnap`
+      );
+      const updatedRoute = await Route.findByIdAndUpdate(
+        rt._id,
+        {
+          routeSnap: photo.Location,
+        },
+        { new: true }
+      );
+      rt = updatedRoute;
+    }
+
     EVENT.emit("update-activity-log", {
       userId: rt.owner,
       message: `You updated route ${rt.rideName}`,

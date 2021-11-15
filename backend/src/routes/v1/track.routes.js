@@ -128,7 +128,7 @@ router.post(
     });
 
     if (HAS_ERROR(req, res) == false)
-      track_controller.updateTrack(params, res);
+      track_controller.updateTrack(params, req.files, res);
   }
 );
 
