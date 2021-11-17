@@ -2,6 +2,7 @@ const httpStatus = require("http-status");
 const { Token, Vehicle } = require("../models");
 const ApiError = require("../helpers/ApiError");
 const Route = require("../models/Route.model");
+const Stop = require('../models/Stop.model');
 
 const saveRoute = async (params) => {
   return await Route.create(params);
@@ -30,6 +31,10 @@ const deleteRouteById = async (routeId) => {
   return await Route.findOneAndDelete({ _id: routeId });
 };
 
+const deleteStopsOfRoute = async (routeId) => {
+  return await Stop.deleteMany({ routeId: routeId });
+};
+
 module.exports = {
   saveRoute,
   updateRoute,
@@ -37,4 +42,5 @@ module.exports = {
   getPaginatedRoutesByUserId,
   getRouteCountByOwnerId,
   deleteRouteById,
+  deleteStopsOfRoute
 };
