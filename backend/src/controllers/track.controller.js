@@ -9,6 +9,7 @@ const {
   getPaginatedRoutesByUserId,
   getRouteCountByOwnerId,
   deleteRouteById,
+  deleteStopsOfRoute,
   updateRoute,
 } = require("../services/route.service");
 const EVENT = require("../triggers/custom-events").customEvent;
@@ -155,6 +156,21 @@ const updateTrack = async (params, files, res) => {
   }
 };
 
+const deleteTrack = async (params, res) => {
+  try {
+    const {
+      routeId
+    } = params;
+
+
+    res.status(200).send({
+      message: "Route deleted successfully",
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 const getSingleRoute = async (params, res) => {
   try {
     // await AUX.checkIfValidId(params.routeId, res);
@@ -206,8 +222,8 @@ const getUserRoutes = async (params, res) => {
 
 const deleteRoute = async (params, res) => {
   try {
-    // await AUX.deleteFromAWS(`routes/${params.routeId}`);
     await AUX.emptyS3Directory(`routes/${params.routeId}/`);
+    await deleteStopsOfRoute(params.routeId);
     const route = await deleteRouteById(params.routeId);
     EVENT.emit("delete-route-in-user", params.routeId, params.userId);
 
