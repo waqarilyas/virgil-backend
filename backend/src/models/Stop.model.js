@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { STOP_TYPES } = require("../helpers/enums");
 const { toJSON } = require("./plugins");
 
 const stopSchema = mongoose.Schema(
@@ -35,6 +36,10 @@ const stopSchema = mongoose.Schema(
       default: [],
       required: false,
     },
+    stopType: {
+      type: String,
+      enum: [STOP_TYPES.DRINKS, STOP_TYPES.FOOD, STOP_TYPES.HIKING],
+    }
   },
   {
     timestamps: true,
