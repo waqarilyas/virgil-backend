@@ -100,12 +100,13 @@ const saveRouteStops = async (params) => {
 
     if (stops.length > 0) {
       stops.forEach(async (st, ind) => {
-        const { coords, name, type, id } = st;
+        const { coords, name, type, id, stopType } = st;
         const stopParams = {
           routeId,
           coords,
           name,
           type,
+          stopType
         };
         const stp = await Stop.create(stopParams);
 

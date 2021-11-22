@@ -33,10 +33,17 @@ const RIDER_REQUEST_TYPE = {
   ADD: "add",
 };
 
+const STOP_TYPES = {
+  FOOD: "food",
+  DRINKS: "drinks",
+  HIKING: "hiking"
+};
+
 module.exports = {
   FRIEND_STATUS,
   ENVIRONMENTS,
   ROUTE_FILTERS,
   NOTIFICATION_TYPES,
   RIDER_REQUEST_TYPE,
+  STOP_TYPES
 };
