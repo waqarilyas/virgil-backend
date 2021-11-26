@@ -103,11 +103,7 @@ const saveTrack = async (params, files, res) => {
 
 const updateTrack = async (params, files, res) => {
   try {
-    const {
-      routeId,
-      coordinates,
-      routeLength,
-    } = params;
+    const { routeId, coordinates, routeLength } = params;
     const coords = JSON.parse(coordinates);
     const geoData = coords[0];
 
@@ -158,10 +154,7 @@ const updateTrack = async (params, files, res) => {
 
 const deleteTrack = async (params, res) => {
   try {
-    const {
-      routeId
-    } = params;
-
+    const { routeId } = params;
 
     res.status(200).send({
       message: "Route deleted successfully",
@@ -348,7 +341,7 @@ const rateRoute = async (params, files, res) => {
 const getUserListing = async (params, res) => {
   try {
     const { perPage, page, filter, lat, lang } = params;
-    let geoJCoords = [parseFloat(lang), parseFloat(lat)]
+    let geoJCoords = [parseFloat(lang), parseFloat(lat)];
     let near = {
       $geometry: {
         type: "Point",
@@ -357,12 +350,12 @@ const getUserListing = async (params, res) => {
     };
 
     let filterValue = {
-      $geoNear: {
-        near: near,
-        distanceField: "distance",
-        spherical: true,
+        $geoNear: {
+          near: near,
+          distanceField: "distance",
+          spherical: true,
+        },
       },
-    },
       sortObj;
 
     switch (filter) {
@@ -520,7 +513,13 @@ const getMapData = async (params, res) => {
     const { userId } = params;
 
     const data = await Route.find({ _id: { $ne: userId } })
-      .select(["coordinates", "rideName", "createdAt", "routeSnap"])
+      .select([
+        "coordinates",
+        "rideName",
+        "createdAt",
+        "routeSnap",
+        "descriptors",
+      ])
       .populate("stops")
       .populate("owner", ["firstName", "lastName"])
       .where("isPublic")
@@ -550,5 +549,5 @@ module.exports = {
   getMapData,
   removeRouteFromFavourites,
   onStartRun,
-  updateTrack
+  updateTrack,
 };
