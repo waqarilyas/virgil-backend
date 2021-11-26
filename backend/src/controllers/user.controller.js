@@ -127,10 +127,34 @@ const updateUser = async (params, userId, files, res) => {
   }
 };
 
+const updateLocation = async (params, userId, res) => {
+  try {
+    let dataToUpdate = {
+      location: {
+        lat: params.lat,
+        lng: params.lng
+      }
+    };
+    const user = await User.findByIdAndUpdate(userId, dataToUpdate, {
+      new: true,
+    });
+    console.log(user);
+
+    res.status(httpStatus.OK).send({
+      status: true,
+      message: "User location updated successfully",
+    });
+  } catch (err) {
+    console.log(err);
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   getUser,
   getAllUsers,
   getUserFriends,
   updateUser,
+  updateLocation
 };

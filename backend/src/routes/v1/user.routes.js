@@ -212,4 +212,47 @@ router.put(
   }
 );
 
+/**
+ * @swagger
+ * /user/updateCurrentLocation:
+ *   put:
+ *     security:
+ *      - bearerAuth: []
+ *     summary: Update user's current location
+ *     tags: [User]
+ *     parameters:
+ *      - in: body
+ *        name:lat
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description:lattitude
+ *      - in: body
+ *        name: lng
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: longitude
+ *     responses:
+ *       "200":
+ *         description: OK
+ */
+router.put(
+  `/updateCurrentLocation`,
+  [
+    AUTHENTICATE,
+    check("lat", "latitude is not provided").not().isEmpty(),
+    check("lng", "longitude is not provided").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    if (HAS_ERROR(req, res) == false) {
+      const params = matchedData(req, {
+        onlyValidData: true,
+      });
+
+      user_controller.updateLocation(params, req.userId, res);
+    }
+  }
+);
+
 module.exports = router;
