@@ -210,8 +210,33 @@ router.put(
       user_controller.updateUser(params, req.userId, req.files, res);
     }
   }
-)
-  ;
+);
+
+/**
+ * @swagger
+ * /user/updateCurrentLocation:
+ *   put:
+ *     security:
+ *      - bearerAuth: []
+ *     summary: Update user's current location
+ *     tags: [User]
+ *     parameters:
+ *      - in: body
+ *        name:lat
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description:lattitude
+ *      - in: body
+ *        name: lng
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: longitude
+ *     responses:
+ *       "200":
+ *         description: OK
+ */
 router.put(
   `/updateCurrentLocation`,
   [
