@@ -210,6 +210,24 @@ router.put(
       user_controller.updateUser(params, req.userId, req.files, res);
     }
   }
+)
+  ;
+router.put(
+  `/updateCurrentLocation`,
+  [
+    AUTHENTICATE,
+    check("lat", "latitude is not provided").not().isEmpty(),
+    check("lng", "longitude is not provided").not().isEmpty(),
+  ],
+  (req, res, next) => {
+    if (HAS_ERROR(req, res) == false) {
+      const params = matchedData(req, {
+        onlyValidData: true,
+      });
+
+      user_controller.updateLocation(params, req.userId, res);
+    }
+  }
 );
 
 module.exports = router;
