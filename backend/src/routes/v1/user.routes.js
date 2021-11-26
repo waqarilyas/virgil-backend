@@ -220,22 +220,28 @@ router.put(
  *      - bearerAuth: []
  *     summary: Update user's current location
  *     tags: [User]
- *     parameters:
- *      - in: body
- *        name:lat
- *        schema:
- *          type: string
- *        required: true
- *        description:lattitude
- *      - in: body
- *        name: lng
- *        schema:
- *          type: string
- *        required: true
- *        description: longitude
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - lat
+ *               - lng
+ *             properties:
+ *               lat:
+ *                 type: string
+ *               lng:
+ *                 type: string
  *     responses:
- *       "200":
  *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *               status:true
  */
 router.put(
   `/updateCurrentLocation`,
