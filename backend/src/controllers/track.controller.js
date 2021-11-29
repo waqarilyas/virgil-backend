@@ -36,6 +36,7 @@ const saveTrack = async (params, files, res) => {
       stops,
       address,
       totalTimeTaken,
+      description
     } = params;
 
     const desc = JSON.parse(descriptors);
@@ -49,6 +50,7 @@ const saveTrack = async (params, files, res) => {
 
     const routeData = {
       rideName,
+      description,
       descriptors: desc,
       isPublic,
       coordinates: coords,
@@ -350,12 +352,12 @@ const getUserListing = async (params, res) => {
     };
 
     let filterValue = {
-        $geoNear: {
-          near: near,
-          distanceField: "distance",
-          spherical: true,
-        },
+      $geoNear: {
+        near: near,
+        distanceField: "distance",
+        spherical: true,
       },
+    },
       sortObj;
 
     switch (filter) {

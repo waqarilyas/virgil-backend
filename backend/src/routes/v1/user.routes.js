@@ -236,12 +236,6 @@ router.put(
  *                 type: string
  *     responses:
  *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *               status:true
  */
 router.put(
   `/updateCurrentLocation`,
