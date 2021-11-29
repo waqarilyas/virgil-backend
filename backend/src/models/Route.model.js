@@ -10,6 +10,9 @@ const routeSchema = mongoose.Schema(
       trim: true,
     },
     descriptors: [String],
+    description: {
+      type: String,
+    },
     isPublic: {
       type: Boolean,
       required: true,

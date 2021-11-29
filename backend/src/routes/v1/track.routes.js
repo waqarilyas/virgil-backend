@@ -92,6 +92,7 @@ router.post(
     AUTHENTICATE,
     check("rideName", "rideName is not valid").not().isEmpty(),
     check("descriptors", "descriptors are not valid").not().isEmpty(),
+    check("description", "Please provide description of route.").optional(),
     check("isPublic", "isPublic is not valid").not().isEmpty(),
     check("coordinates", "coordinates is not valid").not().isEmpty(),
     check("routeSnap", "routeSnap is not valid").optional(),
