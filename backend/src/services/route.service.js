@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const { Token, Vehicle } = require("../models");
 const ApiError = require("../helpers/ApiError");
 const Route = require("../models/Route.model");
-const Stop = require('../models/Stop.model');
+const Stop = require("../models/Stop.model");
 
 const saveRoute = async (params) => {
   return await Route.create(params);
@@ -21,7 +21,9 @@ const getPaginatedRoutesByUserId = async (userId, perPage, page) => {
     .limit(parseInt(perPage))
     .skip(page * perPage)
     .lean()
-    .populate("stops");
+    .populate("stops")
+    .populate("owner", "firstName lastName")
+    .sort({ createdAt: -1 });
 };
 const getRouteCountByOwnerId = async (userId) => {
   return await Route.find({ owner: userId }).countDocuments();
@@ -42,5 +44,5 @@ module.exports = {
   getPaginatedRoutesByUserId,
   getRouteCountByOwnerId,
   deleteRouteById,
-  deleteStopsOfRoute
+  deleteStopsOfRoute,
 };

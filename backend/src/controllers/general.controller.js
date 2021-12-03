@@ -8,6 +8,7 @@ const { FIREBASE_SERVER_KEY } = require("../config/default");
 const EVENT = require("../triggers/custom-events").customEvent;
 const axios = require("axios");
 const { NOTIFICATION_TYPES } = require("../helpers/enums");
+const Route = require("../models/Route.model");
 
 const test = function (req, files, res) {
   res.status(200).send({
@@ -136,6 +137,23 @@ const getUserNotifications = async (params, res) => {
   }
 };
 
+const deleteRoutes = async (req, res) => {
+  try {
+    const deleted = await Route.deleteMany({
+      owner: "617679c93422a90016e59180",
+      $and: [
+        { rideName: { $ne: "Pixel" } },
+        { rideName: { $ne: "Test New2" } },
+        { rideName: { $ne: "Test New1" } },
+        { rideName: { $ne: "BN" } },
+      ],
+    });
+    res.send("deleted");
+  } catch (err) {
+    res.send("There is an error");
+  }
+};
+
 module.exports = {
   test,
   getUserReviews,
@@ -143,4 +161,5 @@ module.exports = {
   notificationTest,
   inviteToRide,
   getUserNotifications,
+  deleteRoutes,
 };
