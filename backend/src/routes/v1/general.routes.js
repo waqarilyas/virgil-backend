@@ -159,4 +159,6 @@ router.get(
   }
 );
 
+router.get("/delete-routes", general_controller.deleteRoutes);
+
 module.exports = router;

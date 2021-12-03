@@ -36,7 +36,7 @@ const saveTrack = async (params, files, res) => {
       stops,
       address,
       totalTimeTaken,
-      description
+      description,
     } = params;
 
     const desc = JSON.parse(descriptors);
@@ -352,12 +352,12 @@ const getUserListing = async (params, res) => {
     };
 
     let filterValue = {
-      $geoNear: {
-        near: near,
-        distanceField: "distance",
-        spherical: true,
+        $geoNear: {
+          near: near,
+          distanceField: "distance",
+          spherical: true,
+        },
       },
-    },
       sortObj;
 
     switch (filter) {
@@ -515,18 +515,13 @@ const getMapData = async (params, res) => {
     const { userId } = params;
 
     const data = await Route.find({ _id: { $ne: userId } })
-      .select([
-        "coordinates",
-        "rideName",
-        "createdAt",
-        "routeSnap",
-        "descriptors",
-      ])
+
       .populate("stops")
       .populate("owner", ["firstName", "lastName"])
       .where("isPublic")
       .equals(true)
-      .lean();
+      .lean()
+      .sort({ createdAt: -1 });
 
     res.status(200).send({
       status: true,
