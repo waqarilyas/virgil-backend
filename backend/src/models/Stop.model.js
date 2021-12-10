@@ -38,8 +38,16 @@ const stopSchema = mongoose.Schema(
     },
     stopType: {
       type: String,
-      enum: [STOP_TYPES.DRINKS, STOP_TYPES.FOOD, STOP_TYPES.HIKING],
-    }
+      enum: [
+        STOP_TYPES.DRINKS,
+        STOP_TYPES.FOOD,
+        STOP_TYPES.HIKING,
+        STOP_TYPES.GROCERIE,
+        STOP_TYPES.FURNITURE,
+        STOP_TYPES.HOTEL,
+        STOP_TYPES.PHARMACY,
+      ],
+    },
   },
   {
     timestamps: true,
