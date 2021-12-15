@@ -95,6 +95,7 @@ const updateRequestInUser = async (params) => {
 const saveRouteStops = async (params) => {
   try {
     const { routeId, stops, files } = params;
+    console.log("total stops:", stops);
 
     let fs = files.filter((file) => file.fieldname != "routeSnap");
 
@@ -106,9 +107,10 @@ const saveRouteStops = async (params) => {
           coords,
           name,
           type,
-          stopType
+          stopType,
         };
         const stp = await Stop.create(stopParams);
+        console.log("stop added:", stp);
 
         fs.forEach(async (file, index) => {
           if (file.fieldname == id) {

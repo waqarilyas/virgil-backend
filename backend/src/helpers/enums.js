@@ -36,7 +36,11 @@ const RIDER_REQUEST_TYPE = {
 const STOP_TYPES = {
   FOOD: "food",
   DRINKS: "drinks",
-  HIKING: "hiking"
+  HIKING: "hiking",
+  GROCERIE: "grocerie",
+  FURNITURE: "furniture",
+  HOTEL: "hotel",
+  PHARMACY: "pharmacy",
 };
 
 module.exports = {
@@ -45,5 +49,5 @@ module.exports = {
   ROUTE_FILTERS,
   NOTIFICATION_TYPES,
   RIDER_REQUEST_TYPE,
-  STOP_TYPES
+  STOP_TYPES,
 };
