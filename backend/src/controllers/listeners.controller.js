@@ -118,6 +118,7 @@ const saveRouteStops = async (params) => {
               file.buffer,
               `routes/${routeId}/stops/${stp._id}/${index}`
             );
+            console.log("image uploaded:", photo);
 
             await Stop.findOneAndUpdate(
               { _id: stp._id },
