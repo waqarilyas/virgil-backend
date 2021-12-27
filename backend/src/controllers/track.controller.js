@@ -37,11 +37,13 @@ const saveTrack = async (params, files, res) => {
       address,
       totalTimeTaken,
       description,
+      chunckedArray,
     } = params;
-
+    console.log("params:", params);
     const desc = JSON.parse(descriptors);
     const coords = JSON.parse(coordinates);
     const parsedStops = JSON.parse(stops);
+    const parsedChunckedArray = JSON.parse(chunckedArray);
     const geoData = coords[0];
 
     const routeLocation = {
@@ -59,8 +61,11 @@ const saveTrack = async (params, files, res) => {
       routeLocation,
       address,
       totalTimeTaken,
+      chunckedArray: parsedChunckedArray,
     };
+    console.log("routeData:", routeData);
     let rt = await saveRoute(routeData);
+    console.log("saved route:", rt);
     EVENT.emit("save-route-stops", {
       routeId: rt._id,
       stops: parsedStops,

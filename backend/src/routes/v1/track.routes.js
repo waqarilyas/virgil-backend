@@ -96,6 +96,7 @@ router.post(
     check("isPublic", "isPublic is not valid").not().isEmpty(),
     check("coordinates", "coordinates is not valid").not().isEmpty(),
     check("routeSnap", "routeSnap is not valid").optional(),
+    check("chunckedArray", "chunckedArray is not valid").optional(),
     check("routeLength", "routeLength is not valid").not().isEmpty(),
     check("timeTaken", "timeTaken is not valid").not().isEmpty(),
     check("owner", "owner is not valid").not().isEmpty(),

@@ -100,6 +100,9 @@ const routeSchema = mongoose.Schema(
         required: true,
       },
     ],
+    chunckedArray: {
+      type: Array,
+    },
     numCurrentRiders: {
       type: Number,
       required: false,
