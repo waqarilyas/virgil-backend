@@ -518,22 +518,29 @@ const getUserFavouriteRoutes = async (params, res) => {
 const getMapData = async (params, res) => {
   try {
     const { userId, lat, long } = params;
-    let nearQuery = {
-      $near:
-      {
-        $geometry:
-        {
-          type: "Point",
-          coordinates: [parseFloat(long), parseFloat(lat)]
-        },
-        $maxDistance: 10000,
+    let query = null;
+    if (lat && long) {
+      query = {
+        _id: { $ne: userId },
+        routeLocation: {
+          $near:
+          {
+            $geometry:
+            {
+              type: "Point",
+              coordinates: [parseFloat(long), parseFloat(lat)]
+            },
+            $maxDistance: 10000,
+          }
+        }
+      }
+    } else {
+      query = {
+        _id: { $ne: userId },
       }
     }
 
-    const data = await Route.find({
-      _id: { $ne: userId },
-      routeLocation: nearQuery
-    }).populate("stops")
+    const data = await Route.find(query).populate("stops")
       .populate("owner", ["firstName", "lastName"])
       .where("isPublic")
       .equals(true)
