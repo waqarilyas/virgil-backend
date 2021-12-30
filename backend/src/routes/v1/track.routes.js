@@ -537,7 +537,11 @@ router.get(
   }
 );
 
-router.get(`/getMapData`, [AUTHENTICATE], (req, res, next) => {
+router.get(`/getMapData`, [
+  AUTHENTICATE,
+  check("lat", "lat is not valid").not().isEmpty(),
+  check("long", "long is not valid").not().isEmpty(),
+], (req, res, next) => {
   const params = matchedData(req, {
     onlyValidData: true,
   });

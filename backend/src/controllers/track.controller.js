@@ -63,7 +63,7 @@ const saveTrack = async (params, files, res) => {
       totalTimeTaken,
       chunckedArray: parsedChunckedArray,
     };
-    console.log("routeData:", routeData);
+
     let rt = await saveRoute(routeData);
     console.log("saved route:", rt);
     EVENT.emit("save-route-stops", {
@@ -357,12 +357,12 @@ const getUserListing = async (params, res) => {
     };
 
     let filterValue = {
-        $geoNear: {
-          near: near,
-          distanceField: "distance",
-          spherical: true,
-        },
+      $geoNear: {
+        near: near,
+        distanceField: "distance",
+        spherical: true,
       },
+    },
       sortObj;
 
     switch (filter) {
@@ -433,7 +433,7 @@ const getUserListing = async (params, res) => {
         sortObj = { $sort: { timesTaken: -1 } };
     }
     let query = [];
-    console.log(filterValue);
+
     query.push(filterValue);
     query.push(sortObj);
     query.push({ $limit: parseInt(perPage) });
@@ -517,16 +517,27 @@ const getUserFavouriteRoutes = async (params, res) => {
 
 const getMapData = async (params, res) => {
   try {
-    const { userId } = params;
+    const { userId, lat, long } = params;
+    let nearQuery = {
+      $near:
+      {
+        $geometry:
+        {
+          type: "Point",
+          coordinates: [parseFloat(long), parseFloat(lat)]
+        },
+        $maxDistance: 10000,
+      }
+    }
 
-    const data = await Route.find({ _id: { $ne: userId } })
-
-      .populate("stops")
+    const data = await Route.find({
+      _id: { $ne: userId },
+      routeLocation: nearQuery
+    }).populate("stops")
       .populate("owner", ["firstName", "lastName"])
       .where("isPublic")
       .equals(true)
       .lean()
-      .sort({ createdAt: -1 });
 
     res.status(200).send({
       status: true,
