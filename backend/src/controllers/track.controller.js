@@ -18,7 +18,7 @@ const Comment = require("../models/Comment.model");
 const { ROUTE_FILTERS, RIDER_REQUEST_TYPE } = require("../helpers/enums");
 
 const test = (params, res) => {
-  res.status(200).send({
+  res.status(200).xxwsend({
     message: "Test successfull",
   });
 };
@@ -45,6 +45,8 @@ const saveTrack = async (params, files, res) => {
     const parsedStops = JSON.parse(stops);
     const parsedChunckedArray = JSON.parse(chunckedArray);
     const geoData = coords[0];
+
+    console.log("parsed stops:", parsedStops);
 
     const routeLocation = {
       coordinates: [geoData.longitude, geoData.latitude],
@@ -357,12 +359,12 @@ const getUserListing = async (params, res) => {
     };
 
     let filterValue = {
-      $geoNear: {
-        near: near,
-        distanceField: "distance",
-        spherical: true,
+        $geoNear: {
+          near: near,
+          distanceField: "distance",
+          spherical: true,
+        },
       },
-    },
       sortObj;
 
     switch (filter) {
@@ -517,34 +519,34 @@ const getUserFavouriteRoutes = async (params, res) => {
 
 const getMapData = async (params, res) => {
   try {
+    console.log("params:", params);
     const { userId, lat, long } = params;
     let query = null;
     if (lat && long) {
       query = {
         _id: { $ne: userId },
         routeLocation: {
-          $near:
-          {
-            $geometry:
-            {
+          $near: {
+            $geometry: {
               type: "Point",
-              coordinates: [parseFloat(long), parseFloat(lat)]
+              coordinates: [parseFloat(long), parseFloat(lat)],
             },
             $maxDistance: 10000,
-          }
-        }
-      }
+          },
+        },
+      };
     } else {
       query = {
         _id: { $ne: userId },
-      }
+      };
     }
 
-    const data = await Route.find(query).populate("stops")
+    const data = await Route.find(query)
+      .populate("stops")
       .populate("owner", ["firstName", "lastName"])
       .where("isPublic")
       .equals(true)
-      .lean()
+      .lean();
 
     res.status(200).send({
       status: true,
