@@ -413,13 +413,12 @@ const getUserListing = async (params, res) => {
       case ROUTE_FILTERS.NEAR_ME:
         sortObj = { $sort: { distance: 1 } };
         near = {
-          $maxDistance: 30000,
+          $maxDistance: 40233.6,
           $geometry: {
             type: "Point",
             coordinates: geoJCoords,
           },
         };
-        console.log(near);
         filterValue = {
           $geoNear: {
             near: near,
@@ -518,33 +517,50 @@ const getUserFavouriteRoutes = async (params, res) => {
 const getMapData = async (params, res) => {
   try {
     const { userId, lat, long } = params;
-    let query = null;
+    let query = [];
     if (lat && long) {
-      query = {
+      query.push({
         _id: { $ne: userId },
         routeLocation: {
-          $near:
-          {
-            $geometry:
-            {
+          $near: {
+            $geometry: {
               type: "Point",
               coordinates: [parseFloat(long), parseFloat(lat)]
             },
-            $maxDistance: 10000,
+            $maxDistance: 40233.6,
           }
         }
-      }
+      });
     } else {
-      query = {
+      query.push({
         _id: { $ne: userId },
-      }
+      });
     }
 
-    const data = await Route.find(query).populate("stops")
-      .populate("owner", ["firstName", "lastName"])
-      .where("isPublic")
-      .equals(true)
-      .lean()
+    query.push({ $match: { isPublic: true } });
+    query.push({
+      $lookup: {
+        from: "User",
+        localField: "_id",
+        foreignField: "owner",
+        as: "user"
+      }
+    })
+    query.push({
+      $lookup: {
+        from: "Stop",
+        localField: "_id",
+        foreignField: "routeId",
+        as: "stops",
+      },
+    });
+
+    // const data = await Route.find(query).populate("stops")
+    //   .populate("owner", ["firstName", "lastName"])
+    //   .where("isPublic")
+    //   .equals(true)
+    //   .lean()
+    const data = await Route.aggregate(query);
 
     res.status(200).send({
       status: true,
