@@ -4,6 +4,8 @@ const httpStatus = require("http-status");
 const BCRYPT = require("bcrypt");
 const AUX = require("../helpers/auxilaries");
 const { User } = require("../models");
+const mongoose = require("mongoose");
+
 const {
   saveRoute,
   getPaginatedRoutesByUserId,
@@ -18,7 +20,7 @@ const Comment = require("../models/Comment.model");
 const { ROUTE_FILTERS, RIDER_REQUEST_TYPE } = require("../helpers/enums");
 
 const test = (params, res) => {
-  res.status(200).send({
+  res.status(200).xxwsend({
     message: "Test successfull",
   });
 };
@@ -45,6 +47,8 @@ const saveTrack = async (params, files, res) => {
     const parsedStops = JSON.parse(stops);
     const parsedChunckedArray = JSON.parse(chunckedArray);
     const geoData = coords[0];
+
+    console.log("parsed stops:", parsedStops);
 
     const routeLocation = {
       coordinates: [geoData.longitude, geoData.latitude],
@@ -357,12 +361,12 @@ const getUserListing = async (params, res) => {
     };
 
     let filterValue = {
-      $geoNear: {
-        near: near,
-        distanceField: "distance",
-        spherical: true,
+        $geoNear: {
+          near: near,
+          distanceField: "distance",
+          spherical: true,
+        },
       },
-    },
       sortObj;
 
     switch (filter) {
@@ -413,13 +417,12 @@ const getUserListing = async (params, res) => {
       case ROUTE_FILTERS.NEAR_ME:
         sortObj = { $sort: { distance: 1 } };
         near = {
-          $maxDistance: 30000,
+          $maxDistance: 40233.6,
           $geometry: {
             type: "Point",
             coordinates: geoJCoords,
           },
         };
-        console.log(near);
         filterValue = {
           $geoNear: {
             near: near,
@@ -517,34 +520,63 @@ const getUserFavouriteRoutes = async (params, res) => {
 
 const getMapData = async (params, res) => {
   try {
-    const { userId, lat, long } = params;
-    let query = null;
+    console.log("params:", params);
+    const { userId, lat, long, radius } = params;
+    console.log("userId", userId);
+    let query = [];
+    let near = {
+      $geometry: {
+        type: "Point",
+        coordinates: [parseFloat(long), parseFloat(lat)],
+      },
+      $maxDistance: parseInt(radius) * 1609.34,
+    };
+
+    let filterValue = {
+      $geoNear: {
+        near: near,
+        distanceField: "routeLocation",
+        spherical: true,
+      },
+    };
+    console.log("filterValue:", filterValue);
     if (lat && long) {
-      query = {
-        _id: { $ne: userId },
-        routeLocation: {
-          $near:
-          {
-            $geometry:
-            {
-              type: "Point",
-              coordinates: [parseFloat(long), parseFloat(lat)]
-            },
-            $maxDistance: 10000,
-          }
-        }
-      }
+      query.push(filterValue);
+      // query.push({
+      //   $match: { owner: { $ne: mongoose.Types.ObjectId(`${userId}`) } },
+      // });
     } else {
-      query = {
-        _id: { $ne: userId },
-      }
+      // query.push({
+      //   // owner: { $ne: userId },
+      //   $match: { owner: { $ne: mongoose.Types.ObjectId(`${userId}`) } },
+      // });
     }
 
-    const data = await Route.find(query).populate("stops")
-      .populate("owner", ["firstName", "lastName"])
-      .where("isPublic")
-      .equals(true)
-      .lean()
+    query.push({ $match: { isPublic: true } });
+    query.push({
+      $lookup: {
+        from: "User",
+        localField: "_id",
+        foreignField: "owner",
+        as: "user",
+      },
+    });
+    query.push({
+      $lookup: {
+        from: "Stop",
+        localField: "_id",
+        foreignField: "routeId",
+        as: "stops",
+      },
+    });
+
+    // const data = await Route.find(query).populate("stops")
+    //   .populate("owner", ["firstName", "lastName"])
+    //   .where("isPublic")
+    //   .equals(true)
+    //   .lean()
+    const data = await Route.aggregate(query);
+    console.log("data:", data);
 
     res.status(200).send({
       status: true,

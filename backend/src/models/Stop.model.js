@@ -36,10 +36,12 @@ const stopSchema = mongoose.Schema(
       default: [],
       required: false,
     },
-    stopType: {
-      type: String,
-      required: false
-    },
+    stopType: [
+      {
+        type: String,
+        required: false,
+      },
+    ],
   },
   {
     timestamps: true,
