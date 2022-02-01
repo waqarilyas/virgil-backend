@@ -377,10 +377,10 @@ const getUserListing = async (params, res) => {
         sortObj = { $sort: { timesTaken: 1 } };
         break;
       case ROUTE_FILTERS.SHORTEST_PATH:
-        sortObj = { $sort: { routeLength: 1 } };
+        sortObj = { $sort: { distance: 1 } };
         break;
       case ROUTE_FILTERS.LONGEST_PATH:
-        sortObj = { $sort: { routeLength: -1 } };
+        sortObj = { $sort: { distance: -1 } };
         break;
       case ROUTE_FILTERS.TOP_RATED:
         sortObj = { $sort: { totalRating: 1 } };
