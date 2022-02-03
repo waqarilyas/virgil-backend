@@ -98,19 +98,20 @@ const notificationTest = async (params, res) => {
 const inviteToRide = async (params, res) => {
   try {
     const { receivers, routeId, message } = params;
-    // const user = await User.findOne({ _id: userId });
     let rec = JSON.parse(receivers);
+    console.log("asjdhajskdhkas", params);
+    const user = await User.findOne({ _id: rec[0]._id });
 
-    rec.forEach((item) => {
-      EVENT.emit("send-notification", {
-        userId: item._id,
-        token: item.deviceId,
-        message: message,
-        route: routeId,
-        request: null,
-        extraInfo: {},
-      });
+    // rec.forEach((item) => {
+    EVENT.emit("send-notification", {
+      userId: user._id,
+      token: user.deviceId,
+      message: message,
+      route: routeId,
+      request: null,
+      extraInfo: {},
     });
+    // });
 
     res.status(200).send({
       status: true,

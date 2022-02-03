@@ -1,9 +1,19 @@
 const httpStatus = require("http-status");
-const { Token, Vehicle, Requests } = require("../models");
+const { Token, Vehicle, Requests, User } = require("../models");
 const ApiError = require("../helpers/ApiError");
 
 const saveRequest = async (params) => {
   const req = await Requests.create(params);
+
+  await User.findOneAndUpdate(
+    { _id: params.requestFrom },
+    { $push: { requests: req._id } }
+  );
+
+  await User.findOneAndUpdate(
+    { _id: params.requestTo },
+    { $push: { requests: req._id } }
+  );
   return req;
 };
 const checkIfFriendRequestExists = async (params) => {

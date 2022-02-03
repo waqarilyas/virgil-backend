@@ -108,6 +108,11 @@ const routeSchema = mongoose.Schema(
       required: false,
       default: 0,
     },
+    distance: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   {
     timestamps: true,

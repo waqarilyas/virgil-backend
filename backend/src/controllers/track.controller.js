@@ -41,14 +41,11 @@ const saveTrack = async (params, files, res) => {
       description,
       chunckedArray,
     } = params;
-    console.log("params:", params);
     const desc = JSON.parse(descriptors);
     const coords = JSON.parse(coordinates);
     const parsedStops = JSON.parse(stops);
     const parsedChunckedArray = JSON.parse(chunckedArray);
     const geoData = coords[0];
-
-    console.log("parsed stops:", parsedStops);
 
     const routeLocation = {
       coordinates: [geoData.longitude, geoData.latitude],
@@ -69,7 +66,6 @@ const saveTrack = async (params, files, res) => {
     };
 
     let rt = await saveRoute(routeData);
-    console.log("saved route:", rt);
     EVENT.emit("save-route-stops", {
       routeId: rt._id,
       stops: parsedStops,
@@ -187,6 +183,13 @@ const getSingleRoute = async (params, res) => {
         },
       });
     if (route) {
+      const dist = getDistanceFromLatLonInKm(
+        route.coordinates[0].latitude,
+        route.coordinates[0].longitude,
+        route.coordinates[route.coordinates.length - 1].latitude,
+        route.coordinates[route.coordinates.length - 1].longitude
+      );
+      route.distance = dist;
       return res.status(httpStatus.OK).send({
         status: true,
         route,
@@ -442,6 +445,7 @@ const getUserListing = async (params, res) => {
     query.push({ $limit: parseInt(perPage) });
     query.push({ $skip: page * perPage });
     query.push({ $match: { isPublic: true } });
+
     query.push({
       $lookup: {
         from: "stops",
@@ -504,11 +508,10 @@ const getUserFavouriteRoutes = async (params, res) => {
   try {
     const { userId, page, perPage } = params;
 
-    const user = await User.findOne({ _id: userId })
+    const user = await User.findById(userId)
       .populate("favouriteRoutes")
       .limit(parseInt(perPage))
       .skip(page * perPage);
-
     res.status(200).send({
       status: true,
       data: user.favouriteRoutes,
@@ -520,9 +523,7 @@ const getUserFavouriteRoutes = async (params, res) => {
 
 const getMapData = async (params, res) => {
   try {
-    console.log("params:", params);
     const { userId, lat, long, radius } = params;
-    console.log("userId", userId);
     let query = [];
     let near = {
       $geometry: {
@@ -539,9 +540,9 @@ const getMapData = async (params, res) => {
         spherical: true,
       },
     };
-    console.log("filterValue:", filterValue);
     if (lat && long) {
       query.push(filterValue);
+      query.push({ $sort: { createdAt: -1 } });
       // query.push({
       //   $match: { owner: { $ne: mongoose.Types.ObjectId(`${userId}`) } },
       // });
@@ -569,6 +570,7 @@ const getMapData = async (params, res) => {
         as: "stops",
       },
     });
+    query.push({ $sort: { createdAt: -1 } });
 
     // const data = await Route.find(query).populate("stops")
     //   .populate("owner", ["firstName", "lastName"])
@@ -576,7 +578,6 @@ const getMapData = async (params, res) => {
     //   .equals(true)
     //   .lean()
     const data = await Route.aggregate(query);
-    console.log("data:", data);
 
     res.status(200).send({
       status: true,
@@ -586,6 +587,25 @@ const getMapData = async (params, res) => {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
   }
 };
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2 - lat1); // deg2rad below
+  var dLon = deg2rad(lon2 - lon1);
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c; // Distance in km
+  return d * 0.621371;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI / 180);
+}
 
 module.exports = {
   test,

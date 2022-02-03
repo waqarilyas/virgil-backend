@@ -64,12 +64,14 @@ const user_controller = require("../../controllers/user.controller");
 
 router.get(
   `/getSingleUser`,
-  [check("id", "User uid is invalid").not().isEmpty()],
+
+  [AUTHENTICATE, check("id", "User uid is invalid").not().isEmpty()],
   (req, res, next) => {
     if (HAS_ERROR(req, res) == false) {
       const params = matchedData(req, {
         onlyValidData: true,
       });
+      params.currentUser = req.userId;
       user_controller.getUser(params, res);
     }
   }
@@ -254,5 +256,9 @@ router.put(
     }
   }
 );
+
+router.get(`/setEnables/:userId`, [AUTHENTICATE], (req, res, next) => {
+  user_controller.updateEnables(req, res);
+});
 
 module.exports = router;
