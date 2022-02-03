@@ -120,6 +120,16 @@ const userSchema = mongoose.Schema(
         ref: "Route",
       },
     ],
+    enables: {
+      request: {
+        type: Boolean,
+        default: true,
+      },
+      invite: {
+        type: Boolean,
+        default: true,
+      },
+    },
   },
   {
     timestamps: true,

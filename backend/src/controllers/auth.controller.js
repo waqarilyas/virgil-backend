@@ -31,6 +31,8 @@ const test = function (req, res) {
 
 const register = async (params, res) => {
   try {
+    console.log("params in register:", params);
+
     const user = await createUser(params);
     const tokens = await generateAuthTokens(user);
     res.status(httpStatus.OK).send({ user, tokens });
@@ -45,6 +47,8 @@ const register = async (params, res) => {
 
 const login = async (params, res) => {
   try {
+    console.log("params in login:", params);
+
     const { email, password, deviceId } = params;
     const user = await loginUserWithEmailAndPassword(email, password);
     await removeToken(user);
@@ -127,11 +131,14 @@ const resetPassword = async (req, res) => {
 
 const socialLogin = async (params, res) => {
   try {
+    console.log("params in social:", params);
     const user = await getUserByEmail(params.email);
 
     if (user) {
       await removeToken(user);
       const tokens = await generateAuthTokens(user);
+      user.deviceId = params.deviceId;
+      await user.save();
       return res.send({ user, tokens });
     } else {
       let firstName = "",

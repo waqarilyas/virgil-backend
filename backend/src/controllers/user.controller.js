@@ -20,12 +20,49 @@ const test = (params, res) => {
 
 const getUser = async (params, res) => {
   try {
-    const user = await getPopulatedUser(
+    let status;
+    console.log("params:", params);
+    const users = await getPopulatedUser(
       params.id,
-      "vehicles routes favouriteRoutes friends"
+      "vehicles routes favouriteRoutes friends requests"
     );
+    var user = users;
+    const currentUser = await User.findOne({
+      _id: params.currentUser,
+    }).populate("requests");
+    console.log("current USer:", currentUser);
+    if (
+      currentUser?.friends.some(function (friend) {
+        return friend.equals(user._id);
+      })
+    ) {
+      console.log("one");
+      status = FRIEND_STATUS.friend;
+    } else if (
+      currentUser?.requests?.some(function (req) {
+        return req.requestTo.equals(user._id) && req.status == "notAccepted";
+      })
+    ) {
+      console.log("two");
+      status = FRIEND_STATUS.requested;
+      console.log("status:", status);
+    } else {
+      let requestedByme = user.requests.filter((req) =>
+        req.requestFrom.equals(currentUser?._id)
+      );
+      if (requestedByme.length > 0) {
+        console.log("three");
+        status = FRIEND_STATUS.requested;
+      } else {
+        console.log("four");
+        status = FRIEND_STATUS.anon;
+      }
+    }
+    user.status = status;
+    console.log("searched:", user.status);
 
     res.status(200).send({
+      friend: status,
       status: true,
       user,
     });
@@ -132,8 +169,8 @@ const updateLocation = async (params, userId, res) => {
     let dataToUpdate = {
       location: {
         lat: params.lat,
-        lng: params.lng
-      }
+        lng: params.lng,
+      },
     };
     const user = await User.findByIdAndUpdate(userId, dataToUpdate, {
       new: true,
@@ -150,11 +187,50 @@ const updateLocation = async (params, userId, res) => {
   }
 };
 
+const updateEnables = async (req, res) => {
+  try {
+    let user;
+    if (req.query.request) {
+      user = await User.findByIdAndUpdate(
+        req.params.userId,
+        { "enables.request": req.query.request },
+        {
+          new: true,
+        }
+      );
+    }
+
+    if (req.query.invite) {
+      user = await User.findByIdAndUpdate(
+        req.params.userId,
+        { "enables.invite": req.query.invite },
+        {
+          new: true,
+        }
+      );
+    } else {
+      return res.send({
+        code: 400,
+        msg: "something is wrong",
+      });
+    }
+    return res.send({
+      user: user,
+      code: 200,
+      msg: "successful",
+    });
+  } catch (err) {
+    console.log(err);
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
 module.exports = {
   test,
   getUser,
   getAllUsers,
   getUserFriends,
   updateUser,
-  updateLocation
+  updateLocation,
+  updateEnables,
 };

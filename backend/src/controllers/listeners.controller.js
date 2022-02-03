@@ -44,10 +44,12 @@ const sendAndStoreNotification = async (params) => {
   try {
     const { token, extraData, message, userId, extraInfo, request, route } =
       params;
+    console.log("params:", params.route);
+    let data;
 
-    let data = JSON.stringify({
+    data = JSON.stringify({
       to: token,
-      data: extraData,
+      data: params,
       notification: {
         title: "Virgil",
         body: message,
@@ -57,6 +59,7 @@ const sendAndStoreNotification = async (params) => {
       },
     });
 
+    console.log("data:", data);
     const config = {
       method: "post",
       url: "https://fcm.googleapis.com/fcm/send",
@@ -66,7 +69,7 @@ const sendAndStoreNotification = async (params) => {
       },
       data,
     };
-    await axios(config);
+    const response = await axios(config);
 
     let notifyParams = {
       userId,
