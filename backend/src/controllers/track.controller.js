@@ -523,7 +523,8 @@ const getUserFavouriteRoutes = async (params, res) => {
 
 const getMapData = async (params, res) => {
   try {
-    const { userId, lat, long, radius } = params;
+    console.log("params:", params);
+    const { userId, lat, long, radius, search } = params;
     let query = [];
     let near = {
       $geometry: {
@@ -542,6 +543,7 @@ const getMapData = async (params, res) => {
     };
     if (lat && long) {
       query.push(filterValue);
+
       query.push({ $sort: { createdAt: -1 } });
       // query.push({
       //   $match: { owner: { $ne: mongoose.Types.ObjectId(`${userId}`) } },
@@ -554,22 +556,39 @@ const getMapData = async (params, res) => {
     }
 
     query.push({ $match: { isPublic: true } });
+    // query.push({
+    //   $lookup: {
+    //     from: "User",
+    //     localField: "_id",
+    //     foreignField: "owner",
+    //     as: "user",
+    //   },
+    // });
     query.push({
       $lookup: {
-        from: "User",
-        localField: "_id",
-        foreignField: "owner",
-        as: "user",
-      },
-    });
-    query.push({
-      $lookup: {
-        from: "Stop",
+        from: "stops",
         localField: "_id",
         foreignField: "routeId",
         as: "stops",
       },
     });
+
+    if (search) {
+      query.push({
+        $match: {
+          $or: [
+            { rideName: { $regex: `^${search}`, $options: "i" } },
+            { address: { $regex: `${search}`, $options: "i" } },
+            { description: { $regex: `${search}`, $options: "i" } },
+            { descriptors: { $regex: `${search}`, $options: "i" } },
+            { "stops.name": { $regex: `${search}`, $options: "i" } },
+            { "stops.stopType": { $regex: `${search}`, $options: "i" } },
+            { "stops.type": { $regex: `${search}`, $options: "i" } },
+            // { "address.city": { $regex: `${search}`, $options: "i" } },
+          ],
+        },
+      });
+    }
     query.push({ $sort: { createdAt: -1 } });
 
     // const data = await Route.find(query).populate("stops")
