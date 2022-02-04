@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const { User } = require("../models");
+const { User, Requests } = require("../models");
 const ApiError = require("../helpers/ApiError");
 const { $where } = require("../models/token.model");
 
@@ -104,8 +104,10 @@ const addToUserFriends = async (userId, friendId) => {
   await User.findByIdAndUpdate(userId, { $push: { friends: friendId } });
 };
 
-const removeUserFriend = async (userId, friendId) => {
-  await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } });
+const removeUserFriend = async (userId, friendId, reqId) => {
+  await Requests.findByIdAndDelete(reqId);
+  await User.findByIdAndUpdate(userId, { $pull: { requests: reqId } });
+  await User.findByIdAndUpdate(friendId, { $pull: { requests: reqId } });
 };
 
 const getPaginatedUsers = async (userId, page, perPage) => {
