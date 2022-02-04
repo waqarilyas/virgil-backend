@@ -461,15 +461,15 @@ const getUserListing = async (params, res) => {
       },
     });
 
-    let routes = await Route.aggregate(query);
+    let route = await Route.aggregate(query);
 
-    const newArray = routes.map((item) => {
+    const routes = route.map((item) => {
       return { ...item, distance: item.distance * 0.000621371 };
     });
 
     res.status(200).send({
       status: true,
-      newArray,
+      routes,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
