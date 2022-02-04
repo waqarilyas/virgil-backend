@@ -18,6 +18,7 @@ const EVENT = require("../triggers/custom-events").customEvent;
 const Route = require("../models/Route.model");
 const Comment = require("../models/Comment.model");
 const { ROUTE_FILTERS, RIDER_REQUEST_TYPE } = require("../helpers/enums");
+const router = require("../routes/v1/track.routes");
 
 const test = (params, res) => {
   res.status(200).xxwsend({
@@ -367,6 +368,7 @@ const getUserListing = async (params, res) => {
         $geoNear: {
           near: near,
           distanceField: "distance",
+          includeLocs: "routeLocation",
           spherical: true,
         },
       },
@@ -386,10 +388,10 @@ const getUserListing = async (params, res) => {
         sortObj = { $sort: { distance: -1 } };
         break;
       case ROUTE_FILTERS.TOP_RATED:
-        sortObj = { $sort: { totalRating: 1 } };
+        sortObj = { $sort: { totalRating: -1 } };
         break;
       case ROUTE_FILTERS.LEAST_RATED:
-        sortObj = { $sort: { totalRating: -1 } };
+        sortObj = { $sort: { totalRating: 1 } };
         break;
       case ROUTE_FILTERS.MOST_STOPS:
         sortObj = { $sort: { numStops: -1 } };
@@ -411,6 +413,7 @@ const getUserListing = async (params, res) => {
           $geoNear: {
             near: near,
             distanceField: "distance",
+            includeLocs: "routeLocation",
             spherical: true,
           },
         };
@@ -426,10 +429,13 @@ const getUserListing = async (params, res) => {
             coordinates: geoJCoords,
           },
         };
+
         filterValue = {
           $geoNear: {
             near: near,
             distanceField: "distance",
+
+            includeLocs: "routeLocation",
             spherical: true,
           },
         };
@@ -455,11 +461,15 @@ const getUserListing = async (params, res) => {
       },
     });
 
-    const routes = await Route.aggregate(query);
+    let routes = await Route.aggregate(query);
+
+    const newArray = routes.map((item) => {
+      return { ...item, distance: item.distance * 0.000621371 };
+    });
 
     res.status(200).send({
       status: true,
-      routes,
+      newArray,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);

@@ -28,6 +28,15 @@ const sendFriendRequest = async (params, res) => {
   try {
     const { requestFrom, requestTo } = params;
 
+    const checkUser = await User.findById(requestTo);
+
+    if (!checkUser.enables.request) {
+      return res.status(400).send({
+        message: "User is Not Accepting Requests",
+        status: false,
+      });
+    }
+
     if (requestFrom === requestTo) {
       return res.status(400).send({
         message: "User cannot send friend request to himself",
@@ -95,7 +104,7 @@ const acceptRejectFriendRequest = async (params, res) => {
     // operation can be ACCEPT or REJECT
     if (operation === "REJECT") {
       await changeRequestStatus(requestId, "REJECTED");
-      await removeUserFriend(request.requestFrom, request.requestTo);
+      await removeUserFriend(request.requestFrom, request.requestTo, requestId);
       EVENT.emit("update-activity-log", {
         userId: request.requestTo,
         message: "You rejected friend request",
