@@ -5,6 +5,8 @@ const BCRYPT = require("bcrypt");
 const AUX = require("../helpers/auxilaries");
 const { User } = require("../models");
 const mongoose = require("mongoose");
+const geolib = require("geolib");
+const axios = require("axios");
 
 const {
   saveRoute,
@@ -184,13 +186,37 @@ const getSingleRoute = async (params, res) => {
         },
       });
     if (route) {
-      const dist = getDistanceFromLatLonInKm(
-        route.coordinates[0].latitude,
-        route.coordinates[0].longitude,
-        route.coordinates[route.coordinates.length - 1].latitude,
-        route.coordinates[route.coordinates.length - 1].longitude
+      const length = route.coordinates.length;
+      console.log("length:", length);
+      // const dist = getDistanceFromLatLonInKm(
+      //   route.coordinates[0].latitude,
+      //   route.coordinates[0].longitude,
+      //   route.coordinates[route.coordinates.length - 1].latitude,
+      //   route.coordinates[route.coordinates.length - 1].longitude
+      // );
+      // const dist = geolib.getDistance(
+      //   {
+      //     latitude: 31.467868,
+      //     longitude: 74.266834,
+      //   },
+      //   {
+      //     latitude: 31.479818,
+      //     longitude: 74.280048,
+      //   }
+      // );
+
+      const dist = await axios.get(
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${
+          route.coordinates[0].latitude
+        },${route.coordinates[0].longitude}&destination=${
+          route.coordinates[length - 1].latitude
+        },${
+          route.coordinates[length - 1].longitude
+        }&key=AIzaSyDrOgjqDQyIr1KbOfJx6Jwd9CAon1-RU5I`
       );
-      route.distance = dist;
+      console.log("distance", dist.data.routes[0].legs[0].distance.value);
+      const temp = dist.data.routes[0].legs[0].distance.value;
+      route.distance = temp * 0.000621371;
       return res.status(httpStatus.OK).send({
         status: true,
         route,
@@ -374,12 +400,19 @@ const getUserListing = async (params, res) => {
       },
       sortObj;
 
+    let arrayCount;
     switch (filter) {
       case ROUTE_FILTERS.MOST_RIDDEN:
-        sortObj = { $sort: { timesTaken: -1 } };
+        arrayCount = {
+          $addFields: { totalRidden: { $size: "$riddenBy" } },
+        };
+        sortObj = { $sort: { totalRidden: -1 } };
         break;
       case ROUTE_FILTERS.LEAST_RIDDEN:
-        sortObj = { $sort: { timesTaken: 1 } };
+        arrayCount = {
+          $addFields: { totalRidden: { $size: "$riddenBy" } },
+        };
+        sortObj = { $sort: { totalRidden: 1 } };
         break;
       case ROUTE_FILTERS.SHORTEST_PATH:
         sortObj = { $sort: { distance: 1 } };
@@ -447,6 +480,13 @@ const getUserListing = async (params, res) => {
     let query = [];
 
     query.push(filterValue);
+    if (
+      filter === ROUTE_FILTERS.MOST_RIDDEN ||
+      filter === ROUTE_FILTERS.LEAST_RIDDEN
+    ) {
+      query.push(arrayCount);
+    }
+
     query.push(sortObj);
     query.push({ $limit: parseInt(perPage) });
     query.push({ $skip: page * perPage });
@@ -463,13 +503,13 @@ const getUserListing = async (params, res) => {
 
     let route = await Route.aggregate(query);
 
-    const routes = route.map((item) => {
+    const newArray = route.map((item) => {
       return { ...item, distance: item.distance * 0.000621371 };
     });
 
     res.status(200).send({
       status: true,
-      routes,
+      newArray,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
