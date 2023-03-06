@@ -1,13 +1,26 @@
 const JWT = require("jsonwebtoken");
 const CONFIG = require("../config/default");
-
+const httpStatus = require("http-status");
 const BCRYPT = require("bcrypt");
 const AUX = require("../helpers/auxilaries");
 const EVENT = require("../triggers/custom-events").customEvent;
-
 const { User } = require("../models");
-const { createUser } = require("../services/user.service");
-const { generateAuthTokens } = require("../services/token.service");
+
+const {
+  createUser,
+  getUserByEmail,
+  changeUserPassword,
+  updateUserDeviceId,
+} = require("../services/user.service");
+const {
+  generateAuthTokens,
+  removeToken,
+} = require("../services/token.service");
+const {
+  loginUserWithEmailAndPassword,
+  authchangePassword,
+} = require("../services/auth.service");
+const { AUTHENTICATE } = require("../middlewares/auth.middleware");
 
 //Simple version, without validation or sanitation
 const test = function (req, res) {
@@ -15,129 +28,62 @@ const test = function (req, res) {
     status: true,
   });
 };
+
 const register = async (params, res) => {
   try {
     const user = await createUser(params);
     const tokens = await generateAuthTokens(user);
     res.status(httpStatus.OK).send({ user, tokens });
   } catch (err) {
-    res.status(err.statusCode).send({
+    console.log(err);
+    res.status(400).send({
       status: false,
-      message: err.message
-    })
+      message: err.message,
+    });
   }
-
-
-  // //check if user already in database
-
-  // try {
-  //   const emailExist = await User.findOne({ email: req.email });
-  //   if (emailExist) {
-  //     return res.status(400).send({
-  //       status: false,
-  //       message: "Email already exists",
-  //     });
-  //   }
-
-  //   //Hash the password
-  //   const salt = await BCRYPT.genSalt(10);
-  //   const hashedPassword = await BCRYPT.hash(req.password, salt);
-
-  //   //create new user
-  //   const user = new User({
-  //     first_name: req.first_name,
-  //     last_name: req.last_name,
-  //     email: req.email,
-  //     password: hashedPassword,
-  //     country: req.country,
-  //     zip: req.zip,
-  //     city: req.city,
-  //   });
-
-  //   const savedUser = await user.save();
-
-  //   //create and assign a token
-  //   const token = JWT.sign({ _id: savedUser._id }, CONFIG.tokenKey);
-  //   let usr = savedUser.toObject();
-  //   delete usr["password"];
-
-  //   res.status(200).send({
-  //     status: true,
-  //     token: token,
-  //     message: "User registered successfully",
-  //     user: usr,
-  //   });
-  // } catch (err) {
-  //   res.status(400).send({
-  //     status: false,
-  //     message: err,
-  //   });
-  // }
 };
 
-const login = async (req, res) => {
-  //check if user exists
-  const user = await User.findOne({ email: req.email });
-  if (!user) {
-    return res.status(400).send("Email not found");
+const login = async (params, res) => {
+  try {
+    const { email, password, deviceId } = params;
+    const user = await loginUserWithEmailAndPassword(email, password);
+    await removeToken(user);
+    const tokens = await generateAuthTokens(user);
+    const dbUser = await updateUserDeviceId(user._id, deviceId);
+    res.send({ user: dbUser, tokens });
+  } catch (err) {
+    res.status(httpStatus.BAD_REQUEST).send({
+      status: false,
+      message: err.message,
+    });
   }
-  //check if password is correct
-  const validPass = await BCRYPT.compare(req.password, user.password);
-  if (!validPass) {
-    return res.status(400).send("Invalid Password");
-  }
-
-  //create and assign a token
-  const token = JWT.sign({ _id: user._id }, CONFIG.tokenKey);
-  let usr = user.toObject();
-  delete usr["password"];
-
-  res.header("authorization", token).send({
-    status: true,
-    authorization: token,
-    message: "successfully logged in",
-    user: usr,
-  });
 };
 
-const forgotPassword = async (req, res) => {
-  // const emailExist = await User.findOne({ email: req.email });
-  // if (!emailExist) {
-  //   return res.status(400).send({
-  //     status: false,
-  //     message: "Email does not exist",
-  //   });
-  // }
-  // const token = JWT.sign({ _id: req.email }, CONFIG.tokenKey, {
-  //   expiresIn: 86400,
-  // });
+const forgotPassword = async (params, res) => {
+  try {
+    const emailExist = await getUserByEmail(params.email);
 
-  // const msg = {
-  //   to: req.email,
-  //   from: "siteseekrr@gmail.com",
-  //   subject: "Password reset email",
-  //   text: "Change Your Password",
-  //   html: `<a href="http://localhost:3000/newPassword/${token}">Click Here To change your Password</a>`,
-  // };
+    if (!emailExist) {
+      return AUX.apiResposne(
+        res,
+        httpStatus.NOT_FOUND,
+        false,
+        "Email doesn't exit."
+      );
+    }
 
-  // sgMail
-  //   .send(msg)
-  //   .then(async () => {
-  //     const passwordToSave = new PasswordToken({
-  //       token,
-  //     });
-  //     await passwordToSave.save();
-  //     res.status(400).send({
-  //       status: false,
-  //       message: "Password Reset email sent successfully on your email address",
-  //     });
-  //   })
-  //   .catch((error) => {
-  //     res.status(400).send({
-  //       status: false,
-  //       message: error,
-  //     });
-  //   });
+    await AUX.sendEmail(
+      params.email,
+      "Password reset email",
+      `Your password reset token for Virgil app is ${params.code}`
+    );
+    res.status(httpStatus.OK).send({
+      status: true,
+      message: "Password Reset code sent successfully on your email address",
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
 };
 
 const verifyCode = async (req, res) => {
@@ -148,32 +94,97 @@ const verifyCode = async (req, res) => {
   });
 };
 
-const changePassword = async (req, res) => {
+const resetPassword = async (req, res) => {
   try {
-    console.log("------req----", req.body);
+    const emailExist = await getUserByEmail(req.email);
 
-    // const salt = await BCRYPT.genSalt(10);
-    // const hashedPassword = await BCRYPT.hash(req.password, salt);
+    if (!emailExist) {
+      return AUX.apiResposne(
+        res,
+        httpStatus.NOT_FOUND,
+        false,
+        "Email doesn't exit."
+      );
+    }
 
-    // await User.findOneAndUpdate(
-    //   { email: req.email },
-    //   {
-    //     password: hashedPassword,
-    //   },
-    //   {
-    //     insert: true,
-    //   }
-    // );
+    const salt = await BCRYPT.genSalt(10);
+    const hashedPassword = await BCRYPT.hash(req.password, salt);
+    await changeUserPassword(req.email, hashedPassword);
 
-    res.status(200).send({
-      status: true,
-      message: "Password Updated Successfullly",
-    });
+    return AUX.apiResposne(
+      res,
+      httpStatus.OK,
+      true,
+      "Password changed successfully"
+    );
   } catch (err) {
     res.status(500).send({
       status: false,
       message: "Unable to change password",
     });
+  }
+};
+
+const socialLogin = async (params, res) => {
+  try {
+    const user = await getUserByEmail(params.email);
+
+    if (user) {
+      await removeToken(user);
+      const tokens = await generateAuthTokens(user);
+      return res.send({ user, tokens });
+    } else {
+      let firstName = "",
+        lastName = "";
+      const splittedArr = params.name.split(" ");
+
+      firstName = splittedArr[0];
+      if (splittedArr.length > 1) {
+        lastName = splittedArr[1];
+      }
+      const userData = {
+        firstName,
+        lastName,
+        email: params.email,
+        deviceId: params.deviceId,
+        platform: params.platform,
+        deviceId: params.deviceId,
+        isSocial: true,
+      };
+      const user = await createUser(userData);
+      const tokens = await generateAuthTokens(user);
+      res
+        .status(httpStatus.OK)
+        .send({ message: "User signup successfull", user, tokens });
+    }
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const logout = async (params, res) => {
+  try {
+    const user = await User.findOne({ _id: params.userId });
+    await removeToken(user);
+    res.status(httpStatus.OK).send({
+      status: true,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
+  }
+};
+
+const changePassword = async (params, res) => {
+  try {
+    const { password, oldPassword, userId } = params;
+    const user = await authchangePassword(userId, oldPassword, password);
+    res.status(httpStatus.OK).send({
+      status: true,
+      message: "Password changed successfully",
+      user,
+    });
+  } catch (err) {
+    return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
   }
 };
 
@@ -183,5 +194,8 @@ module.exports = {
   login,
   forgotPassword,
   verifyCode,
+  resetPassword,
+  socialLogin,
+  logout,
   changePassword,
 };

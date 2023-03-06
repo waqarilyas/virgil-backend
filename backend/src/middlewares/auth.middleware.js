@@ -16,11 +16,11 @@ const AUTHENTICATE = (req, res, next) => {
       Unauthorized(res);
       return;
     } else {
-      if (!decoded || !decoded.uid) {
+      if (!decoded || !decoded.sub) {
         Unauthorized(res);
         return;
       } else {
-        req.userId = decoded.uid;
+        req.userId = decoded.sub;
         next();
       }
     }

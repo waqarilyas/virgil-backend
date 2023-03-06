@@ -1,11 +1,11 @@
-const jwt = require('jsonwebtoken');
-const moment = require('moment');
-const httpStatus = require('http-status');
-const config = require('../config/default');
-const userService = require('./user.service');
-const { Token } = require('../models/token.model');
-const ApiError = require('../helpers/ApiError');
-const { tokenTypes } = require('../helpers/tokens');
+const jwt = require("jsonwebtoken");
+const moment = require("moment");
+const httpStatus = require("http-status");
+const config = require("../config/default");
+const userService = require("./user.service");
+const ApiError = require("../helpers/ApiError");
+const { tokenTypes } = require("../helpers/tokens");
+const { Token } = require("../models");
 
 /**
  * Generate token
@@ -15,7 +15,7 @@ const { tokenTypes } = require('../helpers/tokens');
  * @param {string} [secret]
  * @returns {string}
  */
-const generateToken = (userId, type, secret = config.jwt.secret) => {
+const generateToken = (userId, type, secret = config.jwtSecret) => {
   const payload = {
     sub: userId,
     iat: moment().unix(),
@@ -51,9 +51,14 @@ const saveToken = async (token, userId, type, blacklisted = false) => {
  */
 const verifyToken = async (token, type) => {
   const payload = jwt.verify(token, config.jwt.secret);
-  const tokenDoc = await Token.findOne({ token, type, user: payload.sub, blacklisted: false });
+  const tokenDoc = await Token.findOne({
+    token,
+    type,
+    user: payload.sub,
+    blacklisted: false,
+  });
   if (!tokenDoc) {
-    throw new Error('Token not found');
+    throw new Error("Token not found");
   }
   return tokenDoc;
 };
@@ -77,11 +82,23 @@ const generateAuthTokens = async (user) => {
 const generateResetPasswordToken = async (email) => {
   const user = await userService.getUserByEmail(email);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
+    throw new ApiError(httpStatus.NOT_FOUND, "No users found with this email");
   }
-  const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
-  const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);
-  await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);
+  const expires = moment().add(
+    config.jwt.resetPasswordExpirationMinutes,
+    "minutes"
+  );
+  const resetPasswordToken = generateToken(
+    user.id,
+    expires,
+    tokenTypes.RESET_PASSWORD
+  );
+  await saveToken(
+    resetPasswordToken,
+    user.id,
+    expires,
+    tokenTypes.RESET_PASSWORD
+  );
   return resetPasswordToken;
 };
 
@@ -91,8 +108,15 @@ const generateResetPasswordToken = async (email) => {
  * @returns {Promise<string>}
  */
 const generateVerifyEmailToken = async (user) => {
-  const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
-  const verifyEmailToken = generateToken(user.id, expires, tokenTypes.VERIFY_EMAIL);
+  const expires = moment().add(
+    config.jwt.verifyEmailExpirationMinutes,
+    "minutes"
+  );
+  const verifyEmailToken = generateToken(
+    user.id,
+    expires,
+    tokenTypes.VERIFY_EMAIL
+  );
   await saveToken(verifyEmailToken, user.id, expires, tokenTypes.VERIFY_EMAIL);
   return verifyEmailToken;
 };

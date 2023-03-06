@@ -1,6 +1,7 @@
-const httpStatus = require('http-status');
-const { User } = require('../models');
-const ApiError = require('../helpers/ApiError');
+const httpStatus = require("http-status");
+const { User } = require("../models");
+const ApiError = require("../helpers/ApiError");
+const { $where } = require("../models/token.model");
 
 /**
  * Create a user
@@ -9,7 +10,7 @@ const ApiError = require('../helpers/ApiError');
  */
 const createUser = async (userBody) => {
   if (await User.isEmailTaken(userBody.email)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+    throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
   }
   return User.create(userBody);
 };
@@ -34,7 +35,7 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  return User.findById(id);
+  return User.findById(id).lean();
 };
 
 /**
@@ -53,12 +54,12 @@ const getUserByEmail = async (email) => {
  * @returns {Promise<User>}
  */
 const updateUserById = async (userId, updateBody) => {
-  const user = await getUserById(userId);
+  const user = await User.findOne({ _id: userId });
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
   if (updateBody.email && (await User.isEmailTaken(updateBody.email, userId))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+    throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
   }
   Object.assign(user, updateBody);
   await user.save();
@@ -73,11 +74,60 @@ const updateUserById = async (userId, updateBody) => {
 const deleteUserById = async (userId) => {
   const user = await getUserById(userId);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
   await user.remove();
   return user;
 };
+
+const changeUserPassword = async (email, password) => {
+  let user = await getUserByEmail(email);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  user = await User.findOneAndUpdate(
+    { email: email },
+    {
+      password: password,
+    },
+    {
+      insert: true,
+    }
+  );
+
+  return user;
+};
+
+const addToUserFriends = async (userId, friendId) => {
+  await User.findByIdAndUpdate(userId, { $push: { friends: friendId } });
+};
+
+const removeUserFriend = async (userId, friendId) => {
+  await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } });
+};
+
+const getPaginatedUsers = async (userId, page, perPage) => {
+  return await User.find({ _id: { $ne: userId } })
+    .limit(parseInt(perPage))
+    .skip(page * perPage)
+    .populate("requests")
+    .lean();
+};
+
+const getPopulatedUser = async (id, fields) => {
+  return User.findById(id).populate(fields);
+};
+
+const updateUserDeviceId = async (userId, deviceId) => {
+  return await User.findOneAndUpdate(
+    { _id: userId },
+    { deviceId: deviceId },
+    { new: true }
+  );
+};
+
+// const removeUserFriend = async (userId, friendId) => {};
 
 module.exports = {
   createUser,
@@ -86,4 +136,10 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
+  changeUserPassword,
+  addToUserFriends,
+  removeUserFriend,
+  getPaginatedUsers,
+  getPopulatedUser,
+  updateUserDeviceId,
 };

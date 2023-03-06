@@ -1,8 +1,10 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcryptjs');
-const { toJSON, paginate } = require('./plugins');
-const { roles } = require('../config/roles');
+const mongoose = require("mongoose");
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
+const { toJSON, paginate } = require("./plugins");
+const { roles } = require("../config/roles");
+const ApiError = require("../helpers/ApiError");
+const httpStatus = require("http-status");
 
 const userSchema = mongoose.Schema(
   {
@@ -13,8 +15,16 @@ const userSchema = mongoose.Schema(
     },
     lastName: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
+    },
+    profileImage: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    location: {
+      type: Object,
     },
     email: {
       type: String,
@@ -24,41 +34,43 @@ const userSchema = mongoose.Schema(
       lowercase: true,
       validate(value) {
         if (!validator.isEmail(value)) {
-          throw new Error('Invalid email');
+          throw new Error("Invalid email");
         }
       },
     },
     country: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     zipCode: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     city: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
-      minlength: 8,
-      validate(value) {
-        if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-          throw new Error('Password must contain at least one letter and one number');
-        }
-      },
+      // validate(value) {
+      //   if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+      //     throw new ApiError(
+      //       httpStatus.BAD_REQUEST,
+      //       "Password must contain at least one letter and one number"
+      //     );
+      //   }
+      // },
       private: true, // used by the toJSON plugin
     },
     role: {
       type: String,
       enum: roles,
-      default: 'user',
+      default: "user",
     },
     isEmailVerified: {
       type: Boolean,
@@ -66,8 +78,48 @@ const userSchema = mongoose.Schema(
     },
     deviceId: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
+    isSocial: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    platform: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    vehicles: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Vehicle",
+      },
+    ],
+    routes: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Route",
+      },
+    ],
+    friends: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "User",
+      },
+    ],
+    requests: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Requests",
+      },
+    ],
+    favouriteRoutes: [
+      {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Route",
+      },
+    ],
   },
   {
     timestamps: true,
@@ -99,9 +151,9 @@ userSchema.methods.isPasswordMatch = async function (password) {
   return bcrypt.compare(password, user.password);
 };
 
-userSchema.pre('save', async function (next) {
+userSchema.pre("save", async function (next) {
   const user = this;
-  if (user.isModified('password')) {
+  if (user.isModified("password")) {
     user.password = await bcrypt.hash(user.password, 8);
   }
   next();
@@ -110,6 +162,6 @@ userSchema.pre('save', async function (next) {
 /**
  * @typedef User
  */
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

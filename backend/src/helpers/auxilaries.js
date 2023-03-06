@@ -1,57 +1,58 @@
-// const AWS = require('aws-sdk');
-// const CONFIG = require('../config/default');
-// const MAILER = require('../config/mailer.config');
+const AWS = require("aws-sdk");
+const httpStatus = require("http-status");
+const { isValidObjectId } = require("mongoose");
+const CONFIG = require("../config/default");
+const MAILER = require("../config/mailer.config");
 
-// exports.uploadToAws = function (pdfBuffer, filename, contentType) {
-//     return new Promise((resolve, reject) => {
-//         try {
-//             const s3 = new AWS.S3();
-//             const base64Data = pdfBuffer;
+exports.uploadToAws = function (photo, filename) {
+  return new Promise((resolve, reject) => {
+    try {
+      const s3 = new AWS.S3();
+      const base64Data = photo;
 
-//             const params = {
-//                 Bucket: CONFIG.aws.bucket,
-//                 Key: `${CONFIG.DB_NAME}/${filename}`,
-//                 Body: base64Data,
-//                 ACL: 'public-read',
-//                 // ContentEncoding: 'base64', // required
-//                 // ContentType: `application/pdf`
-//                 ContentType: contentType
-//             }
-//             s3.upload(params, (err, data) => {
-//                 if (err) {
-//                     reject(err);
-//                 }
-//                 resolve(data);
-//             });
-//         } catch (error) {
-//             console.log('Uploading to amazon error', error);
-//             reject(err);
-//         }
-//     })
-// }
+      const params = {
+        Bucket: CONFIG.AWS.bucket,
+        Key: `${CONFIG.DB_NAME}/${filename}`,
+        Body: base64Data,
+        ACL: "public-read",
+        ContentEncoding: "base64",
+      };
+      s3.upload(params, (err, data) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
+      });
+    } catch (error) {
+      console.log("Uploading to amazon error", error);
+      reject(err);
+    }
+  });
+};
 
-// exports.deleteFromAWS = function (key) {
-//     return new Promise((resolve, reject) => {
-//         try {
-//             const s3 = new AWS.S3();
-//             var params = {
-//                 Bucket: CONFIG.aws.bucket,
-//                 Key: `${CONFIG.DB_NAME}/${key}`
-//             }
-//             s3.deleteObject(params, (err, data) => {
-//                 if (err) {
-//                     console.log(err);
-//                     reject();
-//                 } else {
-//                     resolve(data);
-//                 }
-//             })
-//         } catch (error) {
-//             console.log(error);
-//             reject()
-//         }
-//     })
-// }
+exports.deleteFromAWS = function (key) {
+  return new Promise((resolve, reject) => {
+    try {
+      const s3 = new AWS.S3();
+      var params = {
+        Bucket: CONFIG.AWS.bucket,
+        Key: `${CONFIG.DB_NAME}/${key}/`,
+      };
+      s3.deleteObject(params, (err, data) => {
+        if (err) {
+          console.log("---eror deleting data from aws err----", err);
+          reject();
+        } else {
+          console.log("---data deleted successfully from aws----");
+          resolve(data);
+        }
+      });
+    } catch (error) {
+      console.log("---eror deleting data from aws----", error);
+      reject(error);
+    }
+  });
+};
 
 exports.sendEmail = function (to, subject, message) {
   return new Promise((resolve, reject) => {
@@ -59,13 +60,56 @@ exports.sendEmail = function (to, subject, message) {
       from: CONFIG.senderEmail,
       to: to,
       subject: subject,
-      text: message
-    }
-    MAILER.send(mailOptions).then((info) => {
-      resolve(info);
-    }).catch((error) => {
-      console.log(error);
-      reject(error)
+      text: message,
+    };
+    MAILER.send(mailOptions)
+      .then((info) => {
+        resolve(info);
+      })
+      .catch((error) => {
+        console.log(error);
+        reject(error);
+      });
+  });
+};
+exports.checkIfValidId = function (id, res) {
+  if (!isValidObjectId(id)) {
+    return res.status(httpStatus.BAD_REQUEST).send({
+      status: false,
+      message: "invalid id",
     });
-  })
-}
+  }
+};
+
+exports.apiResposne = (response, statusCode, status, msg) => {
+  response.status(statusCode).send({
+    status: status,
+    message: msg,
+  });
+};
+
+exports.emptyS3Directory = async (dir) => {
+  const bucket = CONFIG.AWS.bucket;
+  const s3 = new AWS.S3();
+  const listParams = {
+    Bucket: bucket,
+    Prefix: dir,
+  };
+
+  const listedObjects = await s3.listObjectsV2(listParams).promise();
+
+  if (listedObjects.Contents.length === 0) return;
+
+  const deleteParams = {
+    Bucket: bucket,
+    Delete: { Objects: [] },
+  };
+
+  listedObjects.Contents.forEach(({ Key }) => {
+    deleteParams.Delete.Objects.push({ Key });
+  });
+
+  await s3.deleteObjects(deleteParams).promise();
+
+  if (listedObjects.IsTruncated) await emptyS3Directory(dir);
+};
