@@ -98,24 +98,32 @@ const notificationTest = async (params, res) => {
 const inviteToRide = async (params, res) => {
   try {
     const { receivers, routeId, message } = params;
-    // const user = await User.findOne({ _id: userId });
     let rec = JSON.parse(receivers);
+    console.log("asjdhajskdhkas", params);
+    const user = await User.findOne({ _id: rec[0]._id });
 
-    rec.forEach((item) => {
+    // rec.forEach((item) => {
+    if (user.enables.invite) {
       EVENT.emit("send-notification", {
-        userId: item._id,
-        token: item.deviceId,
+        userId: user._id,
+        token: user.deviceId,
         message: message,
         route: routeId,
         request: null,
         extraInfo: {},
       });
-    });
+      res.status(200).send({
+        status: true,
+        activityLog: "Users invited for ride successfully",
+      });
+    } else {
+      return res.status(400).send({
+        message: "Invite cannot send to This User",
+        status: false,
+      });
+    }
 
-    res.status(200).send({
-      status: true,
-      activityLog: "Users invited for ride successfully",
-    });
+    // });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
   }

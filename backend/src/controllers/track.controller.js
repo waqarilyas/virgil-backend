@@ -4,6 +4,10 @@ const httpStatus = require("http-status");
 const BCRYPT = require("bcrypt");
 const AUX = require("../helpers/auxilaries");
 const { User } = require("../models");
+const mongoose = require("mongoose");
+const geolib = require("geolib");
+const axios = require("axios");
+
 const {
   saveRoute,
   getPaginatedRoutesByUserId,
@@ -16,9 +20,10 @@ const EVENT = require("../triggers/custom-events").customEvent;
 const Route = require("../models/Route.model");
 const Comment = require("../models/Comment.model");
 const { ROUTE_FILTERS, RIDER_REQUEST_TYPE } = require("../helpers/enums");
+const router = require("../routes/v1/track.routes");
 
 const test = (params, res) => {
-  res.status(200).send({
+  res.status(200).xxwsend({
     message: "Test successfull",
   });
 };
@@ -39,7 +44,6 @@ const saveTrack = async (params, files, res) => {
       description,
       chunckedArray,
     } = params;
-    console.log("params:", params);
     const desc = JSON.parse(descriptors);
     const coords = JSON.parse(coordinates);
     const parsedStops = JSON.parse(stops);
@@ -65,7 +69,6 @@ const saveTrack = async (params, files, res) => {
     };
 
     let rt = await saveRoute(routeData);
-    console.log("saved route:", rt);
     EVENT.emit("save-route-stops", {
       routeId: rt._id,
       stops: parsedStops,
@@ -183,6 +186,37 @@ const getSingleRoute = async (params, res) => {
         },
       });
     if (route) {
+      const length = route.coordinates.length;
+      console.log("length:", length);
+      // const dist = getDistanceFromLatLonInKm(
+      //   route.coordinates[0].latitude,
+      //   route.coordinates[0].longitude,
+      //   route.coordinates[route.coordinates.length - 1].latitude,
+      //   route.coordinates[route.coordinates.length - 1].longitude
+      // );
+      // const dist = geolib.getDistance(
+      //   {
+      //     latitude: 31.467868,
+      //     longitude: 74.266834,
+      //   },
+      //   {
+      //     latitude: 31.479818,
+      //     longitude: 74.280048,
+      //   }
+      // );
+
+      const dist = await axios.get(
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${
+          route.coordinates[0].latitude
+        },${route.coordinates[0].longitude}&destination=${
+          route.coordinates[length - 1].latitude
+        },${
+          route.coordinates[length - 1].longitude
+        }&key=AIzaSyDrOgjqDQyIr1KbOfJx6Jwd9CAon1-RU5I`
+      );
+      console.log("distance", dist.data.routes[0].legs[0].distance.value);
+      const temp = dist.data.routes[0].legs[0].distance.value;
+      route.distance = temp * 0.000621371;
       return res.status(httpStatus.OK).send({
         status: true,
         route,
@@ -357,32 +391,40 @@ const getUserListing = async (params, res) => {
     };
 
     let filterValue = {
-      $geoNear: {
-        near: near,
-        distanceField: "distance",
-        spherical: true,
+        $geoNear: {
+          near: near,
+          distanceField: "distance",
+          includeLocs: "routeLocation",
+          spherical: true,
+        },
       },
-    },
       sortObj;
 
+    let arrayCount;
     switch (filter) {
       case ROUTE_FILTERS.MOST_RIDDEN:
-        sortObj = { $sort: { timesTaken: -1 } };
+        arrayCount = {
+          $addFields: { totalRidden: { $size: "$riddenBy" } },
+        };
+        sortObj = { $sort: { totalRidden: -1 } };
         break;
       case ROUTE_FILTERS.LEAST_RIDDEN:
-        sortObj = { $sort: { timesTaken: 1 } };
+        arrayCount = {
+          $addFields: { totalRidden: { $size: "$riddenBy" } },
+        };
+        sortObj = { $sort: { totalRidden: 1 } };
         break;
       case ROUTE_FILTERS.SHORTEST_PATH:
-        sortObj = { $sort: { routeLength: 1 } };
+        sortObj = { $sort: { distance: 1 } };
         break;
       case ROUTE_FILTERS.LONGEST_PATH:
-        sortObj = { $sort: { routeLength: -1 } };
+        sortObj = { $sort: { distance: -1 } };
         break;
       case ROUTE_FILTERS.TOP_RATED:
-        sortObj = { $sort: { totalRating: 1 } };
+        sortObj = { $sort: { totalRating: -1 } };
         break;
       case ROUTE_FILTERS.LEAST_RATED:
-        sortObj = { $sort: { totalRating: -1 } };
+        sortObj = { $sort: { totalRating: 1 } };
         break;
       case ROUTE_FILTERS.MOST_STOPS:
         sortObj = { $sort: { numStops: -1 } };
@@ -404,6 +446,7 @@ const getUserListing = async (params, res) => {
           $geoNear: {
             near: near,
             distanceField: "distance",
+            includeLocs: "routeLocation",
             spherical: true,
           },
         };
@@ -419,10 +462,13 @@ const getUserListing = async (params, res) => {
             coordinates: geoJCoords,
           },
         };
+
         filterValue = {
           $geoNear: {
             near: near,
             distanceField: "distance",
+
+            includeLocs: "routeLocation",
             spherical: true,
           },
         };
@@ -434,10 +480,18 @@ const getUserListing = async (params, res) => {
     let query = [];
 
     query.push(filterValue);
+    if (
+      filter === ROUTE_FILTERS.MOST_RIDDEN ||
+      filter === ROUTE_FILTERS.LEAST_RIDDEN
+    ) {
+      query.push(arrayCount);
+    }
+
     query.push(sortObj);
     query.push({ $limit: parseInt(perPage) });
     query.push({ $skip: page * perPage });
     query.push({ $match: { isPublic: true } });
+
     query.push({
       $lookup: {
         from: "stops",
@@ -447,11 +501,15 @@ const getUserListing = async (params, res) => {
       },
     });
 
-    const routes = await Route.aggregate(query);
+    let route = await Route.aggregate(query);
+
+    const newArray = route.map((item) => {
+      return { ...item, distance: item.distance * 0.000621371 };
+    });
 
     res.status(200).send({
       status: true,
-      routes,
+      newArray,
     });
   } catch (err) {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
@@ -500,11 +558,10 @@ const getUserFavouriteRoutes = async (params, res) => {
   try {
     const { userId, page, perPage } = params;
 
-    const user = await User.findOne({ _id: userId })
+    const user = await User.findById(userId)
       .populate("favouriteRoutes")
       .limit(parseInt(perPage))
       .skip(page * perPage);
-
     res.status(200).send({
       status: true,
       data: user.favouriteRoutes,
@@ -516,44 +573,73 @@ const getUserFavouriteRoutes = async (params, res) => {
 
 const getMapData = async (params, res) => {
   try {
-    const { userId, lat, long } = params;
+    console.log("params:", params);
+    const { userId, lat, long, radius, search } = params;
     let query = [];
+    let near = {
+      $geometry: {
+        type: "Point",
+        coordinates: [parseFloat(long), parseFloat(lat)],
+      },
+      $maxDistance: parseInt(radius) * 1609.34,
+    };
+
+    let filterValue = {
+      $geoNear: {
+        near: near,
+        distanceField: "routeLocation",
+        spherical: true,
+      },
+    };
     if (lat && long) {
-      query.push({
-        _id: { $ne: userId },
-        routeLocation: {
-          $near: {
-            $geometry: {
-              type: "Point",
-              coordinates: [parseFloat(long), parseFloat(lat)]
-            },
-            $maxDistance: 40233.6,
-          }
-        }
-      });
+      query.push(filterValue);
+
+      query.push({ $sort: { createdAt: -1 } });
+      // query.push({
+      //   $match: { owner: { $ne: mongoose.Types.ObjectId(`${userId}`) } },
+      // });
     } else {
-      query.push({
-        _id: { $ne: userId },
-      });
+      // query.push({
+      //   // owner: { $ne: userId },
+      //   $match: { owner: { $ne: mongoose.Types.ObjectId(`${userId}`) } },
+      // });
     }
 
     query.push({ $match: { isPublic: true } });
+    // query.push({
+    //   $lookup: {
+    //     from: "User",
+    //     localField: "_id",
+    //     foreignField: "owner",
+    //     as: "user",
+    //   },
+    // });
     query.push({
       $lookup: {
-        from: "User",
-        localField: "_id",
-        foreignField: "owner",
-        as: "user"
-      }
-    })
-    query.push({
-      $lookup: {
-        from: "Stop",
+        from: "stops",
         localField: "_id",
         foreignField: "routeId",
         as: "stops",
       },
     });
+
+    if (search) {
+      query.push({
+        $match: {
+          $or: [
+            { rideName: { $regex: `^${search}`, $options: "i" } },
+            { address: { $regex: `${search}`, $options: "i" } },
+            { description: { $regex: `${search}`, $options: "i" } },
+            { descriptors: { $regex: `${search}`, $options: "i" } },
+            { "stops.name": { $regex: `${search}`, $options: "i" } },
+            { "stops.stopType": { $regex: `${search}`, $options: "i" } },
+            { "stops.type": { $regex: `${search}`, $options: "i" } },
+            // { "address.city": { $regex: `${search}`, $options: "i" } },
+          ],
+        },
+      });
+    }
+    query.push({ $sort: { createdAt: -1 } });
 
     // const data = await Route.find(query).populate("stops")
     //   .populate("owner", ["firstName", "lastName"])
@@ -570,6 +656,25 @@ const getMapData = async (params, res) => {
     return AUX.apiResposne(res, httpStatus.BAD_REQUEST, false, err.message);
   }
 };
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2 - lat1); // deg2rad below
+  var dLon = deg2rad(lon2 - lon1);
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c; // Distance in km
+  return d * 0.621371;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI / 180);
+}
 
 module.exports = {
   test,

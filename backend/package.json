@@ -21,6 +21,7 @@
     "express-mongo-sanitize": "^2.1.0",
     "express-multipart-file-parser": "^0.1.2",
     "express-validator": "^6.11.1",
+    "geolib": "^3.3.3",
     "helmet": "^4.6.0",
     "http-status": "^1.5.0",
     "jsonwebtoken": "^8.5.1",

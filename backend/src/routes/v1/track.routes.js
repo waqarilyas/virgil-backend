@@ -537,17 +537,24 @@ router.get(
   }
 );
 
-router.get(`/getMapData`, [
-  AUTHENTICATE,
-  check("lat", "lat is not valid").optional(),
-  check("long", "long is not valid").optional(),
-], (req, res, next) => {
-  const params = matchedData(req, {
-    onlyValidData: true,
-  });
+router.get(
+  `/getMapData`,
+  [
+    AUTHENTICATE,
+    check("userId", "lat is not valid").optional(),
+    check("lat", "lat is not valid").optional(),
+    check("long", "long is not valid").optional(),
+    check("radius", "radius is not valid").optional(),
+    check("search", "search is not valid").optional(),
+  ],
+  (req, res, next) => {
+    const params = matchedData(req, {
+      onlyValidData: true,
+    });
 
-  if (HAS_ERROR(req, res) == false) track_controller.getMapData(params, res);
-});
+    if (HAS_ERROR(req, res) == false) track_controller.getMapData(params, res);
+  }
+);
 
 router.get(
   `/onStartRun`,
